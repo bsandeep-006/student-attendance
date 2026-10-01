@@ -5,8 +5,8 @@
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #eef2f7;
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
     color: #1e293b;
 }
 
@@ -21,25 +21,20 @@ body {
 header {
     background: linear-gradient(135deg, #2563eb, #4f46e5);
     color: white;
-    padding: 30px;
     text-align: center;
+    padding: 30px;
     border-radius: 15px;
     margin-bottom: 20px;
 }
 
 header h1 {
-    font-size: 32px;
+    font-size: 30px;
     margin-bottom: 8px;
 }
 
-header p {
-    font-size: 16px;
-}
+/* Controls */
 
-
-/* Top Controls */
-
-.top-controls {
+.controls {
     background: white;
     padding: 20px;
     border-radius: 12px;
@@ -48,10 +43,9 @@ header p {
     align-items: end;
     flex-wrap: wrap;
     margin-bottom: 20px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
 }
 
-.top-controls div {
+.controls div {
     flex: 1;
     min-width: 180px;
 }
@@ -59,182 +53,178 @@ header p {
 label {
     display: block;
     font-weight: bold;
-    margin-bottom: 7px;
+    margin-bottom: 6px;
 }
 
-input,
-select {
+input {
     width: 100%;
-    padding: 12px;
+    padding: 11px;
     border: 1px solid #cbd5e1;
     border-radius: 7px;
     font-size: 15px;
-    background: white;
 }
-
-input:focus,
-select:focus {
-    outline: none;
-    border-color: #2563eb;
-}
-
-
-/* Buttons */
 
 button {
     border: none;
-    padding: 11px 16px;
+    padding: 11px 15px;
     border-radius: 7px;
-    cursor: pointer;
     font-weight: bold;
-    font-size: 14px;
-    transition: 0.2s;
+    cursor: pointer;
 }
 
-button:hover {
-    transform: translateY(-1px);
-}
-
-.export-btn {
+.export {
     background: #16a34a;
     color: white;
 }
 
-
 /* Add Student */
 
-.add-section {
+.add-student {
     background: white;
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 20px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
 }
 
-.add-section h2 {
+.add-student h2 {
     margin-bottom: 15px;
 }
 
-.add-form {
+.add-student {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
-.add-form input {
+.add-student h2 {
+    width: 100%;
+}
+
+.add-student input {
     flex: 1;
+    min-width: 180px;
 }
 
-.add-form button {
+.add {
     background: #2563eb;
     color: white;
 }
 
-
 /* Statistics */
 
-.statistics {
+.stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
     margin-bottom: 20px;
 }
 
-.card {
-    padding: 20px;
+.stat {
     color: white;
-    border-radius: 12px;
     text-align: center;
+    padding: 20px;
+    border-radius: 12px;
 }
 
-.card h3 {
+.stat h3 {
     font-size: 16px;
     margin-bottom: 8px;
 }
 
-.card p {
+.stat p {
     font-size: 30px;
     font-weight: bold;
 }
 
-.blue {
-    background: #2563eb;
+.total {
+    background: #475569;
 }
 
-.green {
+.present {
     background: #16a34a;
 }
 
-.red {
+.absent {
     background: #dc2626;
 }
 
-.purple {
+.percentage {
     background: #7c3aed;
 }
 
+/* Table */
 
-/* Attendance */
-
-.attendance {
+.table-box {
     background: white;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
 }
 
-.attendance h2 {
+.table-box h2 {
     margin-bottom: 20px;
 }
 
-.table-wrapper {
+.table-container {
     overflow-x: auto;
 }
 
 table {
     width: 100%;
-    min-width: 1100px;
+    min-width: 1000px;
     border-collapse: collapse;
 }
 
 th,
 td {
-    padding: 13px 10px;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 8px;
     text-align: center;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 th {
     background: #1e293b;
     color: white;
-    white-space: nowrap;
 }
 
-th:nth-child(2),
 td:nth-child(2) {
     text-align: left;
 }
 
-tr:hover {
-    background: #f8fafc;
-}
-
-
 /* Attendance buttons */
 
-.attendance-btn {
-    width: 75px;
-    color: white;
-    padding: 8px 5px;
+.attendance-buttons {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+
+.present-btn,
+.absent-btn {
+    padding: 7px 9px;
+    font-size: 12px;
 }
 
 .present-btn {
-    background: #16a34a;
+    background: #dcfce7;
+    color: #166534;
 }
 
 .absent-btn {
-    background: #dc2626;
+    background: #fee2e2;
+    color: #991b1b;
 }
 
+/* Selected buttons */
+
+.present-btn.selected {
+    background: #16a34a;
+    color: white;
+}
+
+.absent-btn.selected {
+    background: #dc2626;
+    color: white;
+}
 
 /* Delete */
 
@@ -242,11 +232,6 @@ tr:hover {
     background: #64748b;
     color: white;
 }
-
-.delete-btn:hover {
-    background: #475569;
-}
-
 
 /* Legend */
 
@@ -257,50 +242,34 @@ tr:hover {
     font-weight: bold;
 }
 
-.legend .present {
+.legend .p {
     color: #16a34a;
 }
 
-.legend .absent {
+.legend .a {
     color: #dc2626;
 }
-
-
-/* Footer */
-
-footer {
-    text-align: center;
-    color: #64748b;
-    padding: 25px;
-}
-
 
 /* Mobile */
 
 @media (max-width: 800px) {
 
-    header h1 {
-        font-size: 24px;
-    }
-
-    .add-form {
-        flex-direction: column;
-    }
-
-    .statistics {
+    .stats {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    header h1 {
+        font-size: 24px;
+    }
 }
 
 @media (max-width: 500px) {
 
-    .container {
-        width: 94%;
-    }
-
-    .statistics {
+    .stats {
         grid-template-columns: 1fr;
     }
 
+    .container {
+        width: 94%;
+    }
 }
