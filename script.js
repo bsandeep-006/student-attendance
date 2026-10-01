@@ -2,7 +2,7 @@ const dateInput = document.getElementById("date");
 const searchInput = document.getElementById("search");
 
 let students =
-    JSON.parse(localStorage.getItem("students")) || [];
+    JSON.parse(localStorage.getItem("students")) || {};
 
 let attendance =
     JSON.parse(localStorage.getItem("attendance")) || {};
@@ -14,15 +14,15 @@ const today = new Date().toISOString().split("T")[0];
 dateInput.value = today;
 
 
-// Seven periods
+// 7 periods
 const periods = [
-    "Period 1",
-    "Period 2",
-    "Period 3",
-    "Period 4",
-    "Period 5",
-    "Period 6",
-    "Period 7"
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6",
+    "P7"
 ];
 
 
@@ -45,10 +45,10 @@ function saveData() {
 function addStudent() {
 
     const roll =
-        document.getElementById("rollNumber").value.trim();
+        document.getElementById("roll").value.trim();
 
     const name =
-        document.getElementById("studentName").value.trim();
+        document.getElementById("name").value.trim();
 
 
     if (roll === "" || name === "") {
@@ -57,53 +57,47 @@ function addStudent() {
     }
 
 
-    const exists = students.some(
-        student => student.roll === roll
-    );
-
-
-    if (exists) {
-        alert("This roll number already exists.");
+    if (students[roll]) {
+        alert("Roll number already exists.");
         return;
     }
 
 
-    students.push({
-        id: Date.now(),
+    students[roll] = {
         roll: roll,
         name: name
-    });
+    };
 
 
     saveData();
 
-    document.getElementById("rollNumber").value = "";
-    document.getElementById("studentName").value = "";
+    document.getElementById("roll").value = "";
+    document.getElementById("name").value = "";
 
     displayStudents();
 }
 
 
 // Get attendance
-function getStatus(studentId, period) {
+function getStatus(roll, period) {
 
     const date = dateInput.value;
 
     if (!attendance[date]) {
-        return "Absent";
+        return "";
     }
 
-    if (!attendance[date][studentId]) {
-        return "Absent";
+    if (!attendance[date][roll]) {
+        return "";
     }
 
-    return attendance[date][studentId][period] || "Absent";
+    return attendance[date][roll][period] || "";
 }
 
 
-// Change attendance
-function changeAttendance(
-    studentId,
+// Set attendance
+function setAttendance(
+    roll,
     period,
     status
 ) {
@@ -116,12 +110,12 @@ function changeAttendance(
     }
 
 
-    if (!attendance[date][studentId]) {
-        attendance[date][studentId] = {};
+    if (!attendance[date][roll]) {
+        attendance[date][roll] = {};
     }
 
 
-    attendance[date][studentId][period] = status;
+    attendance[date][roll][period] = status;
 
     saveData();
 
@@ -133,7 +127,7 @@ function changeAttendance(
 function displayStudents() {
 
     const table =
-        document.getElementById("attendanceTable");
+        document.getElementById("tableBody");
 
     table.innerHTML = "";
 
@@ -142,14 +136,22 @@ function displayStudents() {
         searchInput.value.toLowerCase();
 
 
-    const filtered =
-        students.filter(student =>
-            student.name.toLowerCase().includes(search) ||
-            student.roll.toLowerCase().includes(search)
+    const studentList =
+        Object.values(students).filter(student =>
+
+            student.name
+                .toLowerCase()
+                .includes(search)
+
+            ||
+
+            student.roll
+                .toLowerCase()
+                .includes(search)
         );
 
 
-    if (filtered.length === 0) {
+    if (studentList.length === 0) {
 
         table.innerHTML = `
             <tr>
@@ -159,120 +161,132 @@ function displayStudents() {
             </tr>
         `;
 
-        updateStatistics();
+        updateStats();
 
         return;
     }
 
 
-    filtered.forEach(student => {
+    studentList.forEach(student => {
 
-        const row =
-            document.createElement("tr");
+        let row = `
+            <tr>
 
+                <td>
+                    ${student.roll}
+                </td>
 
-        let html = `
-            <td>${student.roll}</td>
-            <td>${student.name}</td>
+                <td>
+                    ${student.name}
+                </td>
         `;
 
 
-        // Seven periods
-        for (let i = 0; i < 7; i++) {
+        // Create 7 periods
+        periods.forEach(period => {
 
             const status =
-                getStatus(student.id, i);
+                getStatus(
+                    student.roll,
+                    period
+                );
 
 
-            if (status === "Present") {
+            row += `
+                <td>
 
-                html += `
-                    <td>
+                    <div class="attendance-buttons">
+
                         <button
-                            class="attendance-btn present-btn"
-                            onclick="changeAttendance(
-                                ${student.id},
-                                ${i},
-                                'Absent'
-                            )"
+                            class="present-btn
+                            ${status === "Present" ? "selected" : ""}"
+                            onclick="
+                                setAttendance(
+                                    '${student.roll}',
+                                    '${period}',
+                                    'Present'
+                                )
+                            "
                         >
-                            ✓ Present
+                            P
                         </button>
-                    </td>
-                `;
 
-            } else {
 
-                html += `
-                    <td>
                         <button
-                            class="attendance-btn absent-btn"
-                            onclick="changeAttendance(
-                                ${student.id},
-                                ${i},
-                                'Present'
-                            )"
+                            class="absent-btn
+                            ${status === "Absent" ? "selected" : ""}"
+                            onclick="
+                                setAttendance(
+                                    '${student.roll}',
+                                    '${period}',
+                                    'Absent'
+                                )
+                            "
                         >
-                            ✕ Absent
+                            A
                         </button>
-                    </td>
-                `;
-            }
-        }
+
+                    </div>
+
+                </td>
+            `;
+        });
 
 
-        html += `
-            <td>
-                <button
-                    class="delete-btn"
-                    onclick="deleteStudent(${student.id})"
-                >
-                    Delete
-                </button>
-            </td>
+        row += `
+
+                <td>
+
+                    <button
+                        class="delete-btn"
+                        onclick="
+                            deleteStudent('${student.roll}')
+                        "
+                    >
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
         `;
 
 
-        row.innerHTML = html;
-
-        table.appendChild(row);
+        table.innerHTML += row;
     });
 
 
-    updateStatistics();
+    updateStats();
 }
 
 
 // Delete student
-function deleteStudent(id) {
+function deleteStudent(roll) {
 
-    const student =
-        students.find(s => s.id === id);
-
+    const student = students[roll];
 
     if (!student) return;
 
 
-    const confirmation =
+    const confirmDelete =
         confirm(
-            `Delete ${student.name} from the register?`
+            `Delete ${student.name}?`
         );
 
 
-    if (!confirmation) return;
+    if (!confirmDelete) {
+        return;
+    }
 
 
-    students =
-        students.filter(
-            student => student.id !== id
-        );
+    delete students[roll];
 
 
-    // Delete attendance data
+    // Delete attendance
     Object.keys(attendance).forEach(date => {
 
         if (attendance[date]) {
-            delete attendance[date][id];
+            delete attendance[date][roll];
         }
 
     });
@@ -285,33 +299,38 @@ function deleteStudent(id) {
 
 
 // Statistics
-function updateStatistics() {
+function updateStats() {
 
     let present = 0;
     let absent = 0;
 
 
-    students.forEach(student => {
+    Object.values(students).forEach(student => {
 
-        for (let period = 0; period < 7; period++) {
+        periods.forEach(period => {
 
             const status =
-                getStatus(student.id, period);
+                getStatus(
+                    student.roll,
+                    period
+                );
 
 
             if (status === "Present") {
                 present++;
-            } else {
+            }
+
+            if (status === "Absent") {
                 absent++;
             }
 
-        }
+        });
 
     });
 
 
     const total =
-        students.length * 7;
+        Object.keys(students).length * 7;
 
 
     const percentage =
@@ -321,23 +340,27 @@ function updateStatistics() {
 
 
     document.getElementById(
-        "totalStudents"
-    ).textContent = students.length;
+        "studentCount"
+    ).textContent =
+        Object.keys(students).length;
 
 
     document.getElementById(
-        "totalPresent"
-    ).textContent = present;
+        "presentCount"
+    ).textContent =
+        present;
 
 
     document.getElementById(
-        "totalAbsent"
-    ).textContent = absent;
+        "absentCount"
+    ).textContent =
+        absent;
 
 
     document.getElementById(
         "percentage"
-    ).textContent = percentage + "%";
+    ).textContent =
+        percentage + "%";
 }
 
 
@@ -348,7 +371,7 @@ searchInput.addEventListener(
 );
 
 
-// Date change
+// Change date
 dateInput.addEventListener(
     "change",
     displayStudents
@@ -362,11 +385,10 @@ function exportCSV() {
 
     let csv =
         "Roll Number,Student Name,Date," +
-        "Period 1,Period 2,Period 3," +
-        "Period 4,Period 5,Period 6,Period 7\n";
+        "P1,P2,P3,P4,P5,P6,P7\n";
 
 
-    students.forEach(student => {
+    Object.values(students).forEach(student => {
 
         let row = [
             student.roll,
@@ -375,25 +397,32 @@ function exportCSV() {
         ];
 
 
-        for (let period = 0; period < 7; period++) {
+        periods.forEach(period => {
 
             row.push(
-                getStatus(student.id, period)
+                getStatus(
+                    student.roll,
+                    period
+                ) || "-"
             );
 
-        }
+        });
 
 
         csv +=
-            row.map(value => `"${value}"`).join(",")
-            + "\n";
+            row.map(value => `"${value}"`)
+               .join(",") + "\n";
+
     });
 
 
     const blob =
-        new Blob([csv], {
-            type: "text/csv;charset=utf-8;"
-        });
+        new Blob(
+            [csv],
+            {
+                type: "text/csv;charset=utf-8;"
+            }
+        );
 
 
     const url =
@@ -417,5 +446,5 @@ function exportCSV() {
 }
 
 
-// Initial display
+// Start
 displayStudents();
