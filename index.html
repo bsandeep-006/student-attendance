@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7 Period Student Attendance Register</title>
+    <title>Student Attendance Register</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,11 +13,10 @@
 
     <header>
         <h1>📚 Student Attendance Register</h1>
-        <p>7 Period Daily Attendance System</p>
+        <p>7 Period Attendance</p>
     </header>
 
-    <!-- Date and Class -->
-    <section class="top-controls">
+    <div class="controls">
 
         <div>
             <label>Date</label>
@@ -26,127 +25,101 @@
 
         <div>
             <label>Class</label>
-            <select id="className">
-                <option>CSE - 1</option>
-                <option>CSE - 2</option>
-                <option>ECE - 1</option>
-                <option>ECE - 2</option>
-                <option>EEE - 1</option>
-                <option>MECH - 1</option>
-            </select>
+            <input type="text" id="className" placeholder="Enter class">
         </div>
 
         <div>
-            <label>Search Student</label>
-            <input
-                type="text"
-                id="search"
-                placeholder="Search name or roll number"
-            >
+            <label>Search</label>
+            <input type="text" id="search" placeholder="Search student">
         </div>
 
-        <button class="export-btn" onclick="exportCSV()">
+        <button onclick="exportCSV()" class="export">
             📥 Export CSV
         </button>
 
-    </section>
+    </div>
 
+    <div class="add-student">
 
-    <!-- Add Student -->
-    <section class="add-section">
+        <h2>Add Student</h2>
 
-        <h2>➕ Add Student</h2>
+        <input
+            type="text"
+            id="roll"
+            placeholder="Roll Number"
+        >
 
-        <div class="add-form">
+        <input
+            type="text"
+            id="name"
+            placeholder="Student Name"
+        >
 
-            <input
-                type="text"
-                id="rollNumber"
-                placeholder="Roll Number"
-            >
+        <button onclick="addStudent()" class="add">
+            + Add Student
+        </button>
 
-            <input
-                type="text"
-                id="studentName"
-                placeholder="Student Name"
-            >
+    </div>
 
-            <button onclick="addStudent()">
-                Add Student
-            </button>
+    <div class="stats">
 
+        <div class="stat total">
+            <h3>Students</h3>
+            <p id="studentCount">0</p>
         </div>
 
-    </section>
-
-
-    <!-- Statistics -->
-    <section class="statistics">
-
-        <div class="card blue">
-            <h3>Total Students</h3>
-            <p id="totalStudents">0</p>
-        </div>
-
-        <div class="card green">
+        <div class="stat present">
             <h3>Present</h3>
-            <p id="totalPresent">0</p>
+            <p id="presentCount">0</p>
         </div>
 
-        <div class="card red">
+        <div class="stat absent">
             <h3>Absent</h3>
-            <p id="totalAbsent">0</p>
+            <p id="absentCount">0</p>
         </div>
 
-        <div class="card purple">
+        <div class="stat percentage">
             <h3>Attendance</h3>
             <p id="percentage">0%</p>
         </div>
 
-    </section>
+    </div>
 
+    <div class="table-box">
 
-    <!-- Attendance Table -->
-    <section class="attendance">
+        <h2>Attendance Register</h2>
 
-        <h2>📋 Daily Attendance</h2>
-
-        <div class="table-wrapper">
+        <div class="table-container">
 
             <table>
 
                 <thead>
                     <tr>
-                        <th>Roll No.</th>
+                        <th>Roll</th>
                         <th>Student Name</th>
-                        <th>Period 1</th>
-                        <th>Period 2</th>
-                        <th>Period 3</th>
-                        <th>Period 4</th>
-                        <th>Period 5</th>
-                        <th>Period 6</th>
-                        <th>Period 7</th>
-                        <th>Action</th>
+                        <th>P1</th>
+                        <th>P2</th>
+                        <th>P3</th>
+                        <th>P4</th>
+                        <th>P5</th>
+                        <th>P6</th>
+                        <th>P7</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
 
-                <tbody id="attendanceTable"></tbody>
+                <tbody id="tableBody"></tbody>
 
             </table>
 
         </div>
 
         <div class="legend">
-            <span class="present">✓ Present</span>
-            <span class="absent">✕ Absent</span>
+            <span class="p">🟢 Present</span>
+            <span class="a">🔴 Absent</span>
         </div>
 
-    </section>
-
-
-    <footer>
-        Student Attendance Register © 2026
-    </footer>
+    </div>
 
 </div>
 
@@ -154,4 +127,3 @@
 
 </body>
 </html>
-
