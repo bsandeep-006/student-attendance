@@ -1,20 +1,47 @@
-const dateInput = document.getElementById("date");
-const searchInput = document.getElementById("search");
+```javascript
+const dateInput =
+    document.getElementById("date");
+
+const searchInput =
+    document.getElementById("search");
+
+
+// ========================================
+// LOAD SAVED STUDENT DATA
+// ========================================
 
 let students =
-    JSON.parse(localStorage.getItem("students")) || {};
+    JSON.parse(
+        localStorage.getItem("students")
+    ) || {};
+
+
+// ========================================
+// LOAD SAVED ATTENDANCE
+// ========================================
 
 let attendance =
-    JSON.parse(localStorage.getItem("attendance")) || {};
+    JSON.parse(
+        localStorage.getItem("attendance")
+    ) || {};
 
 
-// Today's date
-const today = new Date().toISOString().split("T")[0];
+// ========================================
+// TODAY'S DATE
+// ========================================
+
+const today =
+    new Date()
+        .toISOString()
+        .split("T")[0];
 
 dateInput.value = today;
 
 
-// 7 periods
+// ========================================
+// PERIODS
+// ========================================
+
 const periods = [
     "P1",
     "P2",
@@ -26,7 +53,10 @@ const periods = [
 ];
 
 
-// Save data
+// ========================================
+// SAVE DATA TO BROWSER
+// ========================================
+
 function saveData() {
 
     localStorage.setItem(
@@ -41,122 +71,213 @@ function saveData() {
 }
 
 
-// Add student
+// ========================================
+// ADD STUDENT
+// ========================================
+
 function addStudent() {
 
     const roll =
-        document.getElementById("roll").value.trim();
+        document
+            .getElementById("roll")
+            .value
+            .trim();
 
     const name =
-        document.getElementById("name").value.trim();
+        document
+            .getElementById("studentName")
+            .value
+            .trim();
+
+    const studentClass =
+        document
+            .getElementById("studentClass")
+            .value
+            .trim();
 
 
-    if (roll === "" || name === "") {
-        alert("Please enter roll number and student name.");
+    if (
+        roll === "" ||
+        name === "" ||
+        studentClass === ""
+    ) {
+
+        alert(
+            "Please enter Roll Number, Student Name and Class."
+        );
+
         return;
     }
 
 
     if (students[roll]) {
-        alert("Roll number already exists.");
+
+        alert(
+            "This roll number already exists."
+        );
+
         return;
     }
 
 
+    // CREATE STUDENT
+
     students[roll] = {
+
         roll: roll,
-        name: name
+
+        name: name,
+
+        className: studentClass
+
     };
 
 
+    // SAVE IMMEDIATELY
+
     saveData();
 
+
+    // CLEAR FORM
+
     document.getElementById("roll").value = "";
-    document.getElementById("name").value = "";
+
+    document.getElementById("studentName").value = "";
+
+    document.getElementById("studentClass").value = "";
+
 
     displayStudents();
+
+
+    alert(
+        "Student added and saved successfully!"
+    );
 }
 
 
-// Get attendance
-function getStatus(roll, period) {
+// ========================================
+// GET ATTENDANCE STATUS
+// ========================================
 
-    const date = dateInput.value;
+function getStatus(
+    roll,
+    period
+) {
+
+    const date =
+        dateInput.value;
+
 
     if (!attendance[date]) {
         return "";
     }
 
+
     if (!attendance[date][roll]) {
         return "";
     }
 
-    return attendance[date][roll][period] || "";
+
+    return (
+        attendance[date][roll][period]
+        || ""
+    );
 }
 
 
-// Set attendance
+// ========================================
+// SET ATTENDANCE
+// ========================================
+
 function setAttendance(
     roll,
     period,
     status
 ) {
 
-    const date = dateInput.value;
+    const date =
+        dateInput.value;
 
 
     if (!attendance[date]) {
+
         attendance[date] = {};
+
     }
 
 
     if (!attendance[date][roll]) {
+
         attendance[date][roll] = {};
+
     }
 
 
-    attendance[date][roll][period] = status;
+    attendance[date][roll][period] =
+        status;
+
+
+    // SAVE ATTENDANCE
 
     saveData();
+
 
     displayStudents();
 }
 
 
-// Display students
+// ========================================
+// DISPLAY STUDENTS
+// ========================================
+
 function displayStudents() {
 
     const table =
-        document.getElementById("tableBody");
+        document.getElementById(
+            "tableBody"
+        );
+
 
     table.innerHTML = "";
 
 
     const search =
-        searchInput.value.toLowerCase();
+        searchInput.value
+            .toLowerCase();
 
 
     const studentList =
-        Object.values(students).filter(student =>
+        Object.values(students)
+            .filter(student =>
 
-            student.name
-                .toLowerCase()
-                .includes(search)
+                student.name
+                    .toLowerCase()
+                    .includes(search)
 
-            ||
+                ||
 
-            student.roll
-                .toLowerCase()
-                .includes(search)
-        );
+                student.roll
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                student.className
+                    .toLowerCase()
+                    .includes(search)
+
+            );
 
 
-    if (studentList.length === 0) {
+    if (
+        studentList.length === 0
+    ) {
 
         table.innerHTML = `
             <tr>
-                <td colspan="10">
-                    No students found
+                <td colspan="11">
+                    No students found.
                 </td>
             </tr>
         `;
@@ -167,105 +288,227 @@ function displayStudents() {
     }
 
 
-    studentList.forEach(student => {
+    studentList.forEach(
+        student => {
 
-        let row = `
-            <tr>
+            let row = `
 
-                <td>
-                    ${student.roll}
-                </td>
+                <tr>
 
-                <td>
-                    ${student.name}
-                </td>
-        `;
+                    <td>
+                        ${student.roll}
+                    </td>
+
+                    <td>
+                        ${student.name}
+                    </td>
+
+                    <td>
+                        ${student.className}
+                    </td>
+
+            `;
 
 
-        // Create 7 periods
-        periods.forEach(period => {
+            // ==============================
+            // 7 PERIODS
+            // ==============================
 
-            const status =
-                getStatus(
-                    student.roll,
-                    period
-                );
+            periods.forEach(
+                period => {
 
+                    const status =
+                        getStatus(
+                            student.roll,
+                            period
+                        );
+
+
+                    row += `
+
+                        <td>
+
+                            <div
+                                class="attendance-buttons"
+                            >
+
+                                <button
+                                    class="
+                                        present-btn
+                                        ${
+                                            status ===
+                                            "Present"
+                                            ? "selected"
+                                            : ""
+                                        }
+                                    "
+
+                                    onclick="
+                                        setAttendance(
+                                            '${student.roll}',
+                                            '${period}',
+                                            'Present'
+                                        )
+                                    "
+                                >
+                                    P
+                                </button>
+
+
+                                <button
+                                    class="
+                                        absent-btn
+                                        ${
+                                            status ===
+                                            "Absent"
+                                            ? "selected"
+                                            : ""
+                                        }
+                                    "
+
+                                    onclick="
+                                        setAttendance(
+                                            '${student.roll}',
+                                            '${period}',
+                                            'Absent'
+                                        )
+                                    "
+                                >
+                                    A
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    `;
+                }
+            );
+
+
+            // ==============================
+            // ACTION BUTTONS
+            // ==============================
 
             row += `
-                <td>
 
-                    <div class="attendance-buttons">
+                    <td>
 
                         <button
-                            class="present-btn
-                            ${status === "Present" ? "selected" : ""}"
+                            class="edit-btn"
                             onclick="
-                                setAttendance(
-                                    '${student.roll}',
-                                    '${period}',
-                                    'Present'
+                                editStudent(
+                                    '${student.roll}'
                                 )
                             "
                         >
-                            P
+                            Edit
                         </button>
 
 
                         <button
-                            class="absent-btn
-                            ${status === "Absent" ? "selected" : ""}"
+                            class="delete-btn"
                             onclick="
-                                setAttendance(
-                                    '${student.roll}',
-                                    '${period}',
-                                    'Absent'
+                                deleteStudent(
+                                    '${student.roll}'
                                 )
                             "
                         >
-                            A
+                            Delete
                         </button>
 
-                    </div>
+                    </td>
 
-                </td>
+                </tr>
             `;
-        });
 
 
-        row += `
+            table.innerHTML += row;
 
-                <td>
-
-                    <button
-                        class="delete-btn"
-                        onclick="
-                            deleteStudent('${student.roll}')
-                        "
-                    >
-                        Delete
-                    </button>
-
-                </td>
-
-            </tr>
-        `;
-
-
-        table.innerHTML += row;
-    });
+        }
+    );
 
 
     updateStats();
 }
 
 
-// Delete student
+// ========================================
+// EDIT STUDENT
+// ========================================
+
+function editStudent(roll) {
+
+    const student =
+        students[roll];
+
+
+    if (!student) {
+        return;
+    }
+
+
+    const newName =
+        prompt(
+            "Enter student name:",
+            student.name
+        );
+
+
+    if (
+        newName === null ||
+        newName.trim() === ""
+    ) {
+
+        return;
+
+    }
+
+
+    const newClass =
+        prompt(
+            "Enter class:",
+            student.className
+        );
+
+
+    if (
+        newClass === null ||
+        newClass.trim() === ""
+    ) {
+
+        return;
+
+    }
+
+
+    students[roll].name =
+        newName.trim();
+
+
+    students[roll].className =
+        newClass.trim();
+
+
+    saveData();
+
+    displayStudents();
+}
+
+
+// ========================================
+// DELETE STUDENT
+// ========================================
+
 function deleteStudent(roll) {
 
-    const student = students[roll];
+    const student =
+        students[roll];
 
-    if (!student) return;
+
+    if (!student) {
+        return;
+    }
 
 
     const confirmDelete =
@@ -283,13 +526,22 @@ function deleteStudent(roll) {
 
 
     // Delete attendance
-    Object.keys(attendance).forEach(date => {
 
-        if (attendance[date]) {
-            delete attendance[date][roll];
+    Object.keys(
+        attendance
+    ).forEach(
+        date => {
+
+            if (
+                attendance[date]
+            ) {
+
+                delete attendance[date][roll];
+
+            }
+
         }
-
-    });
+    );
 
 
     saveData();
@@ -298,44 +550,70 @@ function deleteStudent(roll) {
 }
 
 
-// Statistics
+// ========================================
+// STATISTICS
+// ========================================
+
 function updateStats() {
 
     let present = 0;
+
     let absent = 0;
 
 
-    Object.values(students).forEach(student => {
+    Object.values(
+        students
+    ).forEach(
+        student => {
 
-        periods.forEach(period => {
+            periods.forEach(
+                period => {
 
-            const status =
-                getStatus(
-                    student.roll,
-                    period
-                );
+                    const status =
+                        getStatus(
+                            student.roll,
+                            period
+                        );
 
 
-            if (status === "Present") {
-                present++;
-            }
+                    if (
+                        status === "Present"
+                    ) {
 
-            if (status === "Absent") {
-                absent++;
-            }
+                        present++;
 
-        });
+                    }
 
-    });
+
+                    if (
+                        status === "Absent"
+                    ) {
+
+                        absent++;
+
+                    }
+
+                }
+            );
+
+        }
+    );
 
 
     const total =
-        Object.keys(students).length * 7;
+        Object.keys(students).length
+        * 7;
 
 
     const percentage =
         total > 0
-            ? ((present / total) * 100).toFixed(1)
+
+            ? (
+                present /
+                total *
+                100
+              ).toFixed(1)
+
             : 0;
 
 
@@ -364,63 +642,45 @@ function updateStats() {
 }
 
 
-// Search
+// ========================================
+// SEARCH
+// ========================================
+
 searchInput.addEventListener(
     "input",
     displayStudents
 );
 
 
-// Change date
+// ========================================
+// DATE CHANGE
+// ========================================
+
 dateInput.addEventListener(
     "change",
     displayStudents
 );
 
 
-// Export CSV
-function exportCSV() {
+// ========================================
+// SAVE STUDENT DATA TO JSON FILE
+// ========================================
 
-    const date = dateInput.value;
+function downloadStudentData() {
 
-    let csv =
-        "Roll Number,Student Name,Date," +
-        "P1,P2,P3,P4,P5,P6,P7\n";
-
-
-    Object.values(students).forEach(student => {
-
-        let row = [
-            student.roll,
-            student.name,
-            date
-        ];
-
-
-        periods.forEach(period => {
-
-            row.push(
-                getStatus(
-                    student.roll,
-                    period
-                ) || "-"
-            );
-
-        });
-
-
-        csv +=
-            row.map(value => `"${value}"`)
-               .join(",") + "\n";
-
-    });
+    const data = JSON.stringify(
+        students,
+        null,
+        4
+    );
 
 
     const blob =
         new Blob(
-            [csv],
+            [data],
             {
-                type: "text/csv;charset=utf-8;"
+                type:
+                    "application/json"
             }
         );
 
@@ -435,6 +695,159 @@ function exportCSV() {
 
     link.href = url;
 
+
+    link.download =
+        "student-data.json";
+
+
+    link.click();
+
+
+    URL.revokeObjectURL(url);
+}
+
+
+// ========================================
+// RESTORE STUDENT DATA
+// ========================================
+
+function restoreStudentData(event) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(e) {
+
+            try {
+
+                const data =
+                    JSON.parse(
+                        e.target.result
+                    );
+
+
+                students = data;
+
+
+                saveData();
+
+
+                displayStudents();
+
+
+                alert(
+                    "Student data restored successfully!"
+                );
+
+            }
+
+            catch(error) {
+
+                alert(
+                    "Invalid student data file."
+                );
+
+            }
+
+        };
+
+
+    reader.readAsText(file);
+}
+
+
+// ========================================
+// EXPORT ATTENDANCE CSV
+// ========================================
+
+function exportCSV() {
+
+    const date =
+        dateInput.value;
+
+
+    let csv =
+        "Roll,Student Name,Class,Date," +
+        "P1,P2,P3,P4,P5,P6,P7\n";
+
+
+    Object.values(
+        students
+    ).forEach(
+        student => {
+
+            let row = [
+
+                student.roll,
+
+                student.name,
+
+                student.className,
+
+                date
+
+            ];
+
+
+            periods.forEach(
+                period => {
+
+                    row.push(
+                        getStatus(
+                            student.roll,
+                            period
+                        ) || "-"
+                    );
+
+                }
+            );
+
+
+            csv +=
+                row
+                    .map(
+                        value =>
+                            `"${value}"`
+                    )
+                    .join(",")
+                + "\n";
+
+        }
+    );
+
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const link =
+        document.createElement("a");
+
+
+    link.href = url;
+
+
     link.download =
         `attendance-${date}.csv`;
 
@@ -446,5 +859,10 @@ function exportCSV() {
 }
 
 
-// Start
+// ========================================
+// START WEBSITE
+// ========================================
+
 displayStudents();
+```
+
