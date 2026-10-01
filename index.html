@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Attendance Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <header>
+            <h1>📚 Student Attendance Register</h1>
+            <p>Manage student attendance easily</p>
+        </header>
+
+        <section class="controls">
+            <div>
+                <label for="date">Attendance Date</label>
+                <input type="date" id="date">
+            </div>
+
+            <div>
+                <label for="search">Search Student</label>
+                <input type="text" id="search" placeholder="Search by name or roll number">
+            </div>
+
+            <button id="exportBtn">📥 Export CSV</button>
+        </section>
+
+        <section class="add-student">
+            <h2>Add Student</h2>
+
+            <div class="form-row">
+                <input type="text" id="rollNumber" placeholder="Roll Number">
+                <input type="text" id="studentName" placeholder="Student Name">
+                <button id="addBtn">+ Add Student</button>
+            </div>
+        </section>
+
+        <section class="statistics">
+            <div class="stat-card total">
+                <h3>Total Students</h3>
+                <p id="totalStudents">0</p>
+            </div>
+
+            <div class="stat-card present">
+                <h3>Present</h3>
+                <p id="presentStudents">0</p>
+            </div>
+
+            <div class="stat-card absent">
+                <h3>Absent</h3>
+                <p id="absentStudents">0</p>
+            </div>
+
+            <div class="stat-card percentage">
+                <h3>Attendance %</h3>
+                <p id="attendancePercentage">0%</p>
+            </div>
+        </section>
+
+        <section class="attendance-section">
+            <h2>Attendance Register</h2>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Roll No.</th>
+                            <th>Student Name</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="studentTable">
+                        <!-- Students added by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>
+            <p>Student Attendance Register © 2026</p>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
