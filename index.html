@@ -1,7 +1,6 @@
 ```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,55 +14,100 @@
 
 <div class="container">
 
-    <!-- HEADER -->
     <header>
         <h1>📚 Student Attendance Register</h1>
-        <p>Daily 7 Period Attendance System</p>
+        <p>Student Management & 7 Period Attendance</p>
     </header>
 
 
-    <!-- ADD ATTENDANCE -->
-    <div class="card">
+    <!-- ================= STUDENT DATA ================= -->
 
-        <h2>➕ Add Attendance</h2>
+    <section class="card">
+
+        <h2>👨‍🎓 Add Student</h2>
 
         <div class="form-grid">
 
             <div class="form-group">
-                <label>Student Name</label>
 
-                <input
-                    type="text"
-                    id="studentName"
-                    placeholder="Enter student name">
-            </div>
-
-
-            <div class="form-group">
                 <label>Roll Number</label>
 
                 <input
                     type="text"
                     id="rollNumber"
                     placeholder="Enter roll number">
+
             </div>
 
 
             <div class="form-group">
+
+                <label>Student Name</label>
+
+                <input
+                    type="text"
+                    id="studentName"
+                    placeholder="Enter student name">
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="add-button"
+            onclick="addStudent()">
+
+            ➕ Add Student
+
+        </button>
+
+    </section>
+
+
+    <!-- ================= ATTENDANCE ================= -->
+
+    <section class="card">
+
+        <h2>📝 Add Attendance</h2>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Student</label>
+
+                <select id="studentSelect">
+
+                    <option value="">
+                        Select Student
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
                 <label>Date</label>
 
                 <input
                     type="date"
                     id="attendanceDate">
+
             </div>
 
 
             <div class="form-group">
+
                 <label>Period</label>
 
                 <select id="period">
 
-                    <option value="">Select Period</option>
+                    <option value="">
+                        Select Period
+                    </option>
 
                     <option value="1">Period 1</option>
                     <option value="2">Period 2</option>
@@ -74,127 +118,131 @@
                     <option value="7">Period 7</option>
 
                 </select>
+
             </div>
 
 
             <div class="form-group">
+
                 <label>Attendance</label>
 
                 <select id="status">
 
                     <option value="">
-                        Select Attendance
+                        Select Status
                     </option>
 
                     <option value="Present">
-                        Present
+                        ✓ Present
                     </option>
 
                     <option value="Absent">
-                        Absent
+                        ✕ Absent
                     </option>
 
                 </select>
+
             </div>
 
         </div>
 
 
         <button
-            class="add-button"
+            class="attendance-button"
             onclick="addAttendance()">
 
             ➕ Add Attendance
 
         </button>
 
-    </div>
+    </section>
 
 
-    <!-- SUMMARY -->
+    <!-- ================= SUMMARY ================= -->
 
-    <div class="summary">
+    <section class="summary">
 
         <div class="summary-box blue">
-            <span>Total Records</span>
-            <strong id="totalRecords">0</strong>
+
+            <span>Total Students</span>
+
+            <strong id="totalStudents">
+                0
+            </strong>
+
         </div>
 
 
         <div class="summary-box green">
+
             <span>Present</span>
-            <strong id="totalPresent">0</strong>
+
+            <strong id="totalPresent">
+                0
+            </strong>
+
         </div>
 
 
         <div class="summary-box red">
+
             <span>Absent</span>
-            <strong id="totalAbsent">0</strong>
+
+            <strong id="totalAbsent">
+                0
+            </strong>
+
         </div>
 
 
         <div class="summary-box purple">
+
             <span>Attendance %</span>
-            <strong id="percentage">0%</strong>
-        </div>
 
-    </div>
-
-
-    <!-- FILTER -->
-
-    <div class="card">
-
-        <h2>🔎 Search Attendance</h2>
-
-        <div class="filter-row">
-
-            <input
-                type="text"
-                id="search"
-                placeholder="Search name or roll number"
-                oninput="displayAttendance()">
-
-
-            <input
-                type="date"
-                id="filterDate"
-                onchange="displayAttendance()">
-
-
-            <select
-                id="filterPeriod"
-                onchange="displayAttendance()">
-
-                <option value="">All Periods</option>
-
-                <option value="1">Period 1</option>
-                <option value="2">Period 2</option>
-                <option value="3">Period 3</option>
-                <option value="4">Period 4</option>
-                <option value="5">Period 5</option>
-                <option value="6">Period 6</option>
-                <option value="7">Period 7</option>
-
-            </select>
-
-
-            <button
-                class="clear-filter"
-                onclick="clearFilters()">
-
-                Clear Filters
-
-            </button>
+            <strong id="percentage">
+                0%
+            </strong>
 
         </div>
 
-    </div>
+    </section>
 
 
-    <!-- ATTENDANCE TABLE -->
+    <!-- ================= STUDENT LIST ================= -->
 
-    <div class="card">
+    <section class="card">
+
+        <h2>👨‍🎓 Student List</h2>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>S.No</th>
+                        <th>Roll Number</th>
+                        <th>Student Name</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="studentTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= ATTENDANCE LIST ================= -->
+
+    <section class="card">
 
         <h2>📋 Attendance Records</h2>
 
@@ -218,7 +266,6 @@
 
                 </thead>
 
-
                 <tbody id="attendanceTable">
 
                 </tbody>
@@ -227,36 +274,24 @@
 
         </div>
 
-    </div>
+    </section>
 
 
-    <!-- DATA MANAGEMENT -->
+    <!-- ================= DATA ================= -->
 
-    <div class="card data-card">
+    <section class="card">
 
         <h2>💾 Data Management</h2>
 
-        <div class="data-buttons">
+        <button
+            class="danger-button"
+            onclick="deleteAllData()">
 
-            <button
-                class="danger-button"
-                onclick="deleteAllAttendance()">
+            🗑 Delete All Data
 
-                🗑 Delete All Data
+        </button>
 
-            </button>
-
-            <button
-                class="export-button"
-                onclick="exportData()">
-
-                📥 Export Data
-
-            </button>
-
-        </div>
-
-    </div>
+    </section>
 
 </div>
 
@@ -266,4 +301,3 @@
 </body>
 </html>
 ```
-
