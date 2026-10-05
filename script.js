@@ -1,7 +1,8 @@
 ```javascript
 // =====================================================
-// STUDENT ATTENDANCE REGISTER - script.js
+// STUDENT ATTENDANCE REGISTER
 // =====================================================
+
 
 // =====================================================
 // ROLL NUMBERS
@@ -118,7 +119,6 @@ const ROLL_NUMBERS = [
     "24G01A4398",
     "24G01A4399",
 
-    // Additional students
     "25G05A4301",
     "25G05A4302",
     "25G05A4303",
@@ -188,15 +188,33 @@ function saveStudents() {
 
 
 // =====================================================
-// SAVE ATTENDANCE DATA
+// SAVE ATTENDANCE TO BROWSER
 // =====================================================
 
 function saveAttendanceData() {
 
-    localStorage.setItem(
-        "attendanceRecords",
-        JSON.stringify(attendance)
-    );
+    try {
+
+        localStorage.setItem(
+            "attendanceRecords",
+            JSON.stringify(attendance)
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Could not save attendance:",
+            error
+        );
+
+        alert(
+            "Unable to save data in this browser."
+        );
+
+        return false;
+    }
 }
 
 
@@ -208,7 +226,8 @@ function getToday() {
 
     const now = new Date();
 
-    const year = now.getFullYear();
+    const year =
+        now.getFullYear();
 
     const month =
         String(now.getMonth() + 1)
@@ -232,9 +251,14 @@ document.addEventListener(
 
         initializeStudents();
 
-        document.getElementById(
-            "attendanceDate"
-        ).value = getToday();
+        const dateInput =
+            document.getElementById(
+                "attendanceDate"
+            );
+
+        if (dateInput) {
+            dateInput.value = getToday();
+        }
 
         updateStudentDropdown();
 
@@ -283,7 +307,7 @@ function updateStudentDropdown() {
 
 
 // =====================================================
-// LOAD STUDENT NAME
+// STUDENT NAME SELECT
 // =====================================================
 
 document.addEventListener(
@@ -311,6 +335,7 @@ document.addEventListener(
             );
 
         if (input) {
+
             input.value =
                 student?.name || "";
         }
@@ -324,15 +349,21 @@ document.addEventListener(
 
 function saveStudentName() {
 
-    const roll =
+    const select =
         document.getElementById(
             "studentEditSelect"
-        ).value;
+        );
 
-    const name =
+    const input =
         document.getElementById(
             "editStudentName"
-        ).value.trim();
+        );
+
+    const roll =
+        select.value;
+
+    const name =
+        input.value.trim();
 
     if (!roll) {
 
@@ -357,7 +388,14 @@ function saveStudentName() {
             item => item.roll === roll
         );
 
-    if (!student) return;
+    if (!student) {
+
+        alert(
+            "Student not found."
+        );
+
+        return;
+    }
 
     student.name = name;
 
@@ -365,26 +403,22 @@ function saveStudentName() {
 
     updateStudentDropdown();
 
-    document.getElementById(
-        "studentEditSelect"
-    ).value = roll;
+    select.value = roll;
 
-    document.getElementById(
-        "editStudentName"
-    ).value = name;
+    input.value = name;
 
     loadAttendance();
 
     displayStudentSummary();
 
     alert(
-        "Student name saved successfully!"
+        `${roll} - ${name} saved successfully!`
     );
 }
 
 
 // =====================================================
-// RESET ALL STUDENT NAMES
+// RESET STUDENT NAMES
 // =====================================================
 
 function resetStudentNames() {
@@ -398,7 +432,9 @@ function resetStudentNames() {
     }
 
     students.forEach(student => {
+
         student.name = "";
+
     });
 
     saveStudents();
@@ -421,9 +457,12 @@ function resetStudentNames() {
 
 function getSelectedDate() {
 
-    return document.getElementById(
-        "attendanceDate"
-    ).value;
+    const input =
+        document.getElementById(
+            "attendanceDate"
+        );
+
+    return input ? input.value : "";
 }
 
 
@@ -433,14 +472,17 @@ function getSelectedDate() {
 
 function getSelectedPeriod() {
 
-    return document.getElementById(
-        "period"
-    ).value;
+    const select =
+        document.getElementById(
+            "period"
+        );
+
+    return select ? select.value : "1";
 }
 
 
 // =====================================================
-// ATTENDANCE KEY
+// GET ATTENDANCE KEY
 // =====================================================
 
 function getAttendanceKey() {
@@ -465,7 +507,9 @@ function loadAttendance() {
     const period =
         getSelectedPeriod();
 
-    if (!date || !period) return;
+    if (!date || !period) {
+        return;
+    }
 
     const key =
         `${date}_period_${period}`;
@@ -478,7 +522,9 @@ function loadAttendance() {
             "attendanceTable"
         );
 
-    if (!table) return;
+    if (!table) {
+        return;
+    }
 
     table.innerHTML =
         students.map(
@@ -488,6 +534,7 @@ function loadAttendance() {
                     saved[student.roll] || "";
 
                 return `
+
                     <tr>
 
                         <td>
@@ -503,6 +550,7 @@ function loadAttendance() {
                         </td>
 
                         <td>
+
                             ${
                                 student.name
                                     ? escapeHTML(
@@ -514,11 +562,13 @@ function loadAttendance() {
                                         </span>
                                       `
                             }
+
                         </td>
 
                         <td>
 
                             <button
+                                type="button"
                                 class="
                                     attendance-btn
                                     present-btn
@@ -545,6 +595,7 @@ function loadAttendance() {
                         <td>
 
                             <button
+                                type="button"
                                 class="
                                     attendance-btn
                                     absent-btn
@@ -569,6 +620,7 @@ function loadAttendance() {
                         </td>
 
                     </tr>
+
                 `;
             }
         ).join("");
@@ -589,7 +641,7 @@ function loadAttendance() {
 
 
 // =====================================================
-// SET ATTENDANCE
+// SELECT PRESENT / ABSENT
 // =====================================================
 
 function setAttendance(
@@ -597,22 +649,46 @@ function setAttendance(
     status
 ) {
 
+    const date =
+        getSelectedDate();
+
+    const period =
+        getSelectedPeriod();
+
+    if (!date) {
+
+        alert(
+            "Please select a date."
+        );
+
+        return;
+    }
+
+    if (!period) {
+
+        alert(
+            "Please select a period."
+        );
+
+        return;
+    }
+
     const key =
-        getAttendanceKey();
+        `${date}_period_${period}`;
 
     if (!attendance[key]) {
+
         attendance[key] = {};
     }
 
     attendance[key][roll] =
         status;
 
-    // Save immediately
-    saveAttendanceData();
-
+    // Refresh screen only.
+    // Final saving is done by SAVE ATTENDANCE.
     loadAttendance();
 
-    displayStudentSummary();
+    updateCurrentSummary();
 }
 
 
@@ -622,68 +698,132 @@ function setAttendance(
 
 function saveAttendance() {
 
-    const key =
-        getAttendanceKey();
+    const date =
+        getSelectedDate();
 
-    if (!attendance[key]) {
+    const period =
+        getSelectedPeriod();
+
+    if (!date) {
 
         alert(
-            "Please mark attendance first."
+            "Please select a date."
         );
 
         return;
     }
 
-    const marked =
-        Object.keys(
-            attendance[key]
+    if (!period) {
+
+        alert(
+            "Please select a period."
+        );
+
+        return;
+    }
+
+    const key =
+        `${date}_period_${period}`;
+
+    const records =
+        attendance[key] || {};
+
+    const markedStudents =
+        students.filter(
+            student =>
+                records[student.roll] ===
+                "Present" ||
+                records[student.roll] ===
+                "Absent"
+        );
+
+    if (markedStudents.length === 0) {
+
+        alert(
+            "Please mark Present or Absent for at least one student."
+        );
+
+        return;
+    }
+
+    const saved =
+        saveAttendanceData();
+
+    if (!saved) {
+        return;
+    }
+
+    const present =
+        markedStudents.filter(
+            student =>
+                records[student.roll] ===
+                "Present"
         ).length;
 
-    if (marked === 0) {
+    const absent =
+        markedStudents.filter(
+            student =>
+                records[student.roll] ===
+                "Absent"
+        ).length;
 
-        alert(
-            "Please mark attendance first."
-        );
+    const notMarked =
+        students.length -
+        markedStudents.length;
 
-        return;
-    }
-
-    saveAttendanceData();
-
-    alert(
-        `Attendance saved for ${marked} students.`
-    );
+    updateCurrentSummary();
 
     displayStudentSummary();
+
+    alert(
+        `✅ Attendance saved!\n\n` +
+        `Date: ${formatDate(date)}\n` +
+        `Period: ${period}\n\n` +
+        `Present: ${present}\n` +
+        `Absent: ${absent}\n` +
+        `Not Marked: ${notMarked}`
+    );
 }
 
 
 // =====================================================
-// MARK ALL PRESENT / ABSENT
+// MARK ALL
 // =====================================================
 
 function markAll(status) {
 
+    const date =
+        getSelectedDate();
+
+    const period =
+        getSelectedPeriod();
+
+    if (!date || !period) {
+
+        alert(
+            "Please select date and period."
+        );
+
+        return;
+    }
+
     const key =
-        getAttendanceKey();
+        `${date}_period_${period}`;
 
     if (!attendance[key]) {
+
         attendance[key] = {};
     }
 
     students.forEach(student => {
 
-        attendance[key][
-            student.roll
-        ] = status;
-
+        attendance[key][student.roll] =
+            status;
     });
-
-    saveAttendanceData();
 
     loadAttendance();
 
-    displayStudentSummary();
+    updateCurrentSummary();
 }
 
 
@@ -724,7 +864,7 @@ function clearCurrentPeriod() {
 
 
 // =====================================================
-// CURRENT PERIOD SUMMARY
+// CURRENT SUMMARY
 // =====================================================
 
 function updateCurrentSummary() {
@@ -745,6 +885,7 @@ function updateCurrentSummary() {
             current[student.roll] ===
             "Present"
         ) {
+
             present++;
         }
 
@@ -752,6 +893,7 @@ function updateCurrentSummary() {
             current[student.roll] ===
             "Absent"
         ) {
+
             absent++;
         }
     });
@@ -761,30 +903,54 @@ function updateCurrentSummary() {
         present -
         absent;
 
-    document.getElementById(
-        "totalStudents"
-    ).textContent =
-        students.length;
+    const totalElement =
+        document.getElementById(
+            "totalStudents"
+        );
 
-    document.getElementById(
-        "presentCount"
-    ).textContent =
-        present;
+    const presentElement =
+        document.getElementById(
+            "presentCount"
+        );
 
-    document.getElementById(
-        "absentCount"
-    ).textContent =
-        absent;
+    const absentElement =
+        document.getElementById(
+            "absentCount"
+        );
 
-    document.getElementById(
-        "notMarkedCount"
-    ).textContent =
-        notMarked;
+    const notMarkedElement =
+        document.getElementById(
+            "notMarkedCount"
+        );
+
+    if (totalElement) {
+
+        totalElement.textContent =
+            students.length;
+    }
+
+    if (presentElement) {
+
+        presentElement.textContent =
+            present;
+    }
+
+    if (absentElement) {
+
+        absentElement.textContent =
+            absent;
+    }
+
+    if (notMarkedElement) {
+
+        notMarkedElement.textContent =
+            notMarked;
+    }
 }
 
 
 // =====================================================
-// STUDENT-WISE SUMMARY
+// STUDENT SUMMARY
 // =====================================================
 
 function displayStudentSummary() {
@@ -816,6 +982,7 @@ function displayStudentSummary() {
                     status ===
                     "Present"
                 ) {
+
                     present++;
                 }
 
@@ -823,6 +990,7 @@ function displayStudentSummary() {
                     status ===
                     "Absent"
                 ) {
+
                     absent++;
                 }
             });
@@ -845,6 +1013,7 @@ function displayStudentSummary() {
                     : "percentage-bad";
 
             return `
+
                 <tr>
 
                     <td>
@@ -875,11 +1044,15 @@ function displayStudentSummary() {
                         ${total}
                     </td>
 
-                    <td class="${percentageClass}">
+                    <td
+                        class="${percentageClass}">
+
                         ${percentage}%
+
                     </td>
 
                 </tr>
+
             `;
 
         }).join("");
@@ -1015,6 +1188,7 @@ function formatDate(date) {
     if (
         parts.length !== 3
     ) {
+
         return date;
     }
 
@@ -1062,6 +1236,4 @@ function escapeHTML(value) {
         );
 }
 ```
-
-
 
