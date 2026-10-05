@@ -1,15 +1,11 @@
 ```javascript
 // =====================================================
-// STUDENT ATTENDANCE REGISTER
+// STUDENT ATTENDANCE REGISTER - script.js
 // =====================================================
-
 
 // =====================================================
 // ROLL NUMBERS
 // =====================================================
-
-// Add or change this list if you have the exact
-// roll-number list from your college.
 
 const ROLL_NUMBERS = [
 
@@ -123,7 +119,6 @@ const ROLL_NUMBERS = [
     "24G01A4399",
 
     // Additional students
-
     "25G05A4301",
     "25G05A4302",
     "25G05A4303",
@@ -134,26 +129,17 @@ const ROLL_NUMBERS = [
 
 
 // =====================================================
-// STUDENT DATA
+// DATA
 // =====================================================
 
 let students =
     JSON.parse(
-        localStorage.getItem(
-            "attendanceStudents"
-        )
+        localStorage.getItem("attendanceStudents")
     ) || [];
-
-
-// =====================================================
-// ATTENDANCE DATA
-// =====================================================
 
 let attendance =
     JSON.parse(
-        localStorage.getItem(
-            "attendanceRecords"
-        )
+        localStorage.getItem("attendanceRecords")
     ) || {};
 
 
@@ -165,35 +151,24 @@ function initializeStudents() {
 
     let changed = false;
 
+    ROLL_NUMBERS.forEach(roll => {
 
-    ROLL_NUMBERS.forEach(
-        roll => {
+        const exists = students.some(
+            student => student.roll === roll
+        );
 
-            const exists =
-                students.some(
-                    student =>
-                        student.roll === roll
-                );
+        if (!exists) {
 
+            students.push({
+                roll: roll,
+                name: ""
+            });
 
-            if (!exists) {
-
-                students.push({
-
-                    roll: roll,
-
-                    name: ""
-
-                });
-
-                changed = true;
-            }
+            changed = true;
         }
-    );
-
+    });
 
     if (changed) {
-
         saveStudents();
     }
 }
@@ -213,7 +188,7 @@ function saveStudents() {
 
 
 // =====================================================
-// SAVE ATTENDANCE
+// SAVE ATTENDANCE DATA
 // =====================================================
 
 function saveAttendanceData() {
@@ -233,31 +208,27 @@ function getToday() {
 
     const now = new Date();
 
-    const year =
-        now.getFullYear();
+    const year = now.getFullYear();
 
     const month =
-        String(
-            now.getMonth() + 1
-        ).padStart(2, "0");
+        String(now.getMonth() + 1)
+        .padStart(2, "0");
 
     const day =
-        String(
-            now.getDate()
-        ).padStart(2, "0");
-
+        String(now.getDate())
+        .padStart(2, "0");
 
     return `${year}-${month}-${day}`;
 }
 
 
 // =====================================================
-// SETUP
+// PAGE LOAD
 // =====================================================
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    function () {
 
         initializeStudents();
 
@@ -265,13 +236,11 @@ document.addEventListener(
             "attendanceDate"
         ).value = getToday();
 
-
         updateStudentDropdown();
 
         loadAttendance();
 
         displayStudentSummary();
-
     }
 );
 
@@ -287,50 +256,39 @@ function updateStudentDropdown() {
             "studentEditSelect"
         );
 
+    if (!select) return;
 
     select.innerHTML = `
-
         <option value="">
             Select Roll Number
         </option>
-
     `;
 
+    students.forEach(student => {
 
-    students.forEach(
-        student => {
+        const option =
+            document.createElement("option");
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+        option.value =
+            student.roll;
 
+        option.textContent =
+            student.name
+                ? `${student.roll} - ${student.name}`
+                : `${student.roll} - Name not added`;
 
-            option.value =
-                student.roll;
-
-
-            option.textContent =
-                student.name
-                    ? `${student.roll} - ${student.name}`
-                    : `${student.roll} - Name not added`;
-
-
-            select.appendChild(
-                option
-            );
-        }
-    );
+        select.appendChild(option);
+    });
 }
 
 
 // =====================================================
-// LOAD SELECTED STUDENT NAME
+// LOAD STUDENT NAME
 // =====================================================
 
 document.addEventListener(
     "change",
-    event => {
+    function (event) {
 
         if (
             event.target.id !==
@@ -339,29 +297,29 @@ document.addEventListener(
             return;
         }
 
-
         const roll =
             event.target.value;
 
-
         const student =
             students.find(
-                item =>
-                    item.roll === roll
+                item => item.roll === roll
             );
 
+        const input =
+            document.getElementById(
+                "editStudentName"
+            );
 
-        document.getElementById(
-            "editStudentName"
-        ).value =
-            student?.name || "";
-
+        if (input) {
+            input.value =
+                student?.name || "";
+        }
     }
 );
 
 
 // =====================================================
-// ADD / SAVE STUDENT NAME
+// SAVE STUDENT NAME
 // =====================================================
 
 function saveStudentName() {
@@ -371,12 +329,10 @@ function saveStudentName() {
             "studentEditSelect"
         ).value;
 
-
     const name =
         document.getElementById(
             "editStudentName"
         ).value.trim();
-
 
     if (!roll) {
 
@@ -387,7 +343,6 @@ function saveStudentName() {
         return;
     }
 
-
     if (!name) {
 
         alert(
@@ -397,40 +352,30 @@ function saveStudentName() {
         return;
     }
 
-
     const student =
         students.find(
-            item =>
-                item.roll === roll
+            item => item.roll === roll
         );
 
-
-    if (!student) {
-        return;
-    }
-
+    if (!student) return;
 
     student.name = name;
-
 
     saveStudents();
 
     updateStudentDropdown();
 
-    displayStudentSummary();
-
-    loadAttendance();
-
-
     document.getElementById(
         "studentEditSelect"
     ).value = roll;
-
 
     document.getElementById(
         "editStudentName"
     ).value = name;
 
+    loadAttendance();
+
+    displayStudentSummary();
 
     alert(
         "Student name saved successfully!"
@@ -439,7 +384,7 @@ function saveStudentName() {
 
 
 // =====================================================
-// RESET STUDENT NAMES
+// RESET ALL STUDENT NAMES
 // =====================================================
 
 function resetStudentNames() {
@@ -452,31 +397,26 @@ function resetStudentNames() {
         return;
     }
 
-
-    students.forEach(
-        student => {
-            student.name = "";
-        }
-    );
-
+    students.forEach(student => {
+        student.name = "";
+    });
 
     saveStudents();
 
     updateStudentDropdown();
 
-    displayStudentSummary();
-
-    loadAttendance();
-
-
     document.getElementById(
         "editStudentName"
     ).value = "";
+
+    loadAttendance();
+
+    displayStudentSummary();
 }
 
 
 // =====================================================
-// GET CURRENT DATE
+// GET SELECTED DATE
 // =====================================================
 
 function getSelectedDate() {
@@ -488,7 +428,7 @@ function getSelectedDate() {
 
 
 // =====================================================
-// GET CURRENT PERIOD
+// GET SELECTED PERIOD
 // =====================================================
 
 function getSelectedPeriod() {
@@ -522,47 +462,37 @@ function loadAttendance() {
     const date =
         getSelectedDate();
 
-
     const period =
         getSelectedPeriod();
 
-
-    if (!date || !period) {
-        return;
-    }
-
+    if (!date || !period) return;
 
     const key =
         `${date}_period_${period}`;
 
-
     const saved =
         attendance[key] || {};
-
 
     const table =
         document.getElementById(
             "attendanceTable"
         );
 
+    if (!table) return;
 
     table.innerHTML =
         students.map(
             (student, index) => {
 
                 const status =
-                    saved[student.roll] ||
-                    "";
-
+                    saved[student.roll] || "";
 
                 return `
-
                     <tr>
 
                         <td>
                             ${index + 1}
                         </td>
-
 
                         <td>
                             <strong>
@@ -572,22 +502,23 @@ function loadAttendance() {
                             </strong>
                         </td>
 
-
                         <td>
                             ${
                                 student.name
                                     ? escapeHTML(
                                         student.name
                                       )
-                                    : '<span class="no-name">Name not added</span>'
+                                    : `
+                                        <span class="no-name">
+                                            Name not added
+                                        </span>
+                                      `
                             }
                         </td>
-
 
                         <td>
 
                             <button
-
                                 class="
                                     attendance-btn
                                     present-btn
@@ -598,7 +529,6 @@ function loadAttendance() {
                                             : ""
                                     }
                                 "
-
                                 onclick="
                                     setAttendance(
                                         '${student.roll}',
@@ -612,11 +542,9 @@ function loadAttendance() {
 
                         </td>
 
-
                         <td>
 
                             <button
-
                                 class="
                                     attendance-btn
                                     absent-btn
@@ -627,7 +555,6 @@ function loadAttendance() {
                                             : ""
                                     }
                                 "
-
                                 onclick="
                                     setAttendance(
                                         '${student.roll}',
@@ -642,18 +569,20 @@ function loadAttendance() {
                         </td>
 
                     </tr>
-
                 `;
-
             }
         ).join("");
 
+    const currentInfo =
+        document.getElementById(
+            "currentInfo"
+        );
 
-    document.getElementById(
-        "currentInfo"
-    ).textContent =
-        `${formatDate(date)} • Period ${period}`;
+    if (currentInfo) {
 
+        currentInfo.textContent =
+            `${formatDate(date)} • Period ${period}`;
+    }
 
     updateCurrentSummary();
 }
@@ -671,21 +600,15 @@ function setAttendance(
     const key =
         getAttendanceKey();
 
-
     if (!attendance[key]) {
-
         attendance[key] = {};
     }
-
 
     attendance[key][roll] =
         status;
 
-
     // Save immediately
-
     saveAttendanceData();
-
 
     loadAttendance();
 
@@ -694,14 +617,13 @@ function setAttendance(
 
 
 // =====================================================
-// SAVE ATTENDANCE
+// SAVE ATTENDANCE BUTTON
 // =====================================================
 
 function saveAttendance() {
 
     const key =
         getAttendanceKey();
-
 
     if (!attendance[key]) {
 
@@ -712,12 +634,10 @@ function saveAttendance() {
         return;
     }
 
-
     const marked =
         Object.keys(
             attendance[key]
         ).length;
-
 
     if (marked === 0) {
 
@@ -728,21 +648,18 @@ function saveAttendance() {
         return;
     }
 
-
     saveAttendanceData();
-
 
     alert(
         `Attendance saved for ${marked} students.`
     );
-
 
     displayStudentSummary();
 }
 
 
 // =====================================================
-// MARK ALL
+// MARK ALL PRESENT / ABSENT
 // =====================================================
 
 function markAll(status) {
@@ -750,23 +667,17 @@ function markAll(status) {
     const key =
         getAttendanceKey();
 
-
     if (!attendance[key]) {
-
         attendance[key] = {};
     }
 
+    students.forEach(student => {
 
-    students.forEach(
-        student => {
+        attendance[key][
+            student.roll
+        ] = status;
 
-            attendance[key][
-                student.roll
-            ] = status;
-
-        }
-    );
-
+    });
 
     saveAttendanceData();
 
@@ -785,14 +696,14 @@ function clearCurrentPeriod() {
     const key =
         getAttendanceKey();
 
+    if (!attendance[key]) {
 
-    if (
-        !attendance[key]
-    ) {
+        alert(
+            "No attendance found for this period."
+        );
 
         return;
     }
-
 
     if (
         !confirm(
@@ -802,9 +713,7 @@ function clearCurrentPeriod() {
         return;
     }
 
-
     delete attendance[key];
-
 
     saveAttendanceData();
 
@@ -815,7 +724,7 @@ function clearCurrentPeriod() {
 
 
 // =====================================================
-// CURRENT SUMMARY
+// CURRENT PERIOD SUMMARY
 // =====================================================
 
 function updateCurrentSummary() {
@@ -823,62 +732,49 @@ function updateCurrentSummary() {
     const key =
         getAttendanceKey();
 
-
     const current =
         attendance[key] || {};
-
 
     let present = 0;
 
     let absent = 0;
 
+    students.forEach(student => {
 
-    students.forEach(
-        student => {
-
-            if (
-                current[student.roll] ===
-                "Present"
-            ) {
-
-                present++;
-
-            } else if (
-                current[student.roll] ===
-                "Absent"
-            ) {
-
-                absent++;
-
-            }
-
+        if (
+            current[student.roll] ===
+            "Present"
+        ) {
+            present++;
         }
-    );
 
+        if (
+            current[student.roll] ===
+            "Absent"
+        ) {
+            absent++;
+        }
+    });
 
     const notMarked =
         students.length -
         present -
         absent;
 
-
     document.getElementById(
         "totalStudents"
     ).textContent =
         students.length;
-
 
     document.getElementById(
         "presentCount"
     ).textContent =
         present;
 
-
     document.getElementById(
         "absentCount"
     ).textContent =
         absent;
-
 
     document.getElementById(
         "notMarkedCount"
@@ -898,121 +794,95 @@ function displayStudentSummary() {
             "summaryTable"
         );
 
+    if (!table) return;
 
     table.innerHTML =
-        students.map(
-            student => {
+        students.map(student => {
 
-                let present = 0;
+            let present = 0;
 
-                let absent = 0;
+            let absent = 0;
 
+            Object.values(
+                attendance
+            ).forEach(periodData => {
 
-                Object.values(
-                    attendance
-                ).forEach(
-                    periodData => {
+                const status =
+                    periodData[
+                        student.roll
+                    ];
 
-                        const status =
-                            periodData[
-                                student.roll
-                            ];
+                if (
+                    status ===
+                    "Present"
+                ) {
+                    present++;
+                }
 
+                if (
+                    status ===
+                    "Absent"
+                ) {
+                    absent++;
+                }
+            });
 
-                        if (
-                            status ===
-                            "Present"
-                        ) {
+            const total =
+                present + absent;
 
-                            present++;
+            const percentage =
+                total > 0
+                    ? (
+                        present /
+                        total *
+                        100
+                      ).toFixed(1)
+                    : "0.0";
 
-                        } else if (
-                            status ===
-                            "Absent"
-                        ) {
+            const percentageClass =
+                Number(percentage) >= 75
+                    ? "percentage-good"
+                    : "percentage-bad";
 
-                            absent++;
+            return `
+                <tr>
 
+                    <td>
+                        ${escapeHTML(
+                            student.roll
+                        )}
+                    </td>
+
+                    <td>
+                        ${
+                            student.name
+                                ? escapeHTML(
+                                    student.name
+                                  )
+                                : "Name not added"
                         }
+                    </td>
 
-                    }
-                );
+                    <td>
+                        ${present}
+                    </td>
 
+                    <td>
+                        ${absent}
+                    </td>
 
-                const total =
-                    present + absent;
+                    <td>
+                        ${total}
+                    </td>
 
+                    <td class="${percentageClass}">
+                        ${percentage}%
+                    </td>
 
-                const percentage =
-                    total > 0
-                        ? (
-                            present /
-                            total *
-                            100
-                          ).toFixed(1)
-                        : "0.0";
+                </tr>
+            `;
 
-
-                const percentageClass =
-                    Number(
-                        percentage
-                    ) >= 75
-                        ? "percentage-good"
-                        : "percentage-bad";
-
-
-                return `
-
-                    <tr>
-
-                        <td>
-                            ${escapeHTML(
-                                student.roll
-                            )}
-                        </td>
-
-
-                        <td>
-
-                            ${
-                                student.name
-                                    ? escapeHTML(
-                                        student.name
-                                      )
-                                    : "Name not added"
-                            }
-
-                        </td>
-
-
-                        <td>
-                            ${present}
-                        </td>
-
-
-                        <td>
-                            ${absent}
-                        </td>
-
-
-                        <td>
-                            ${total}
-                        </td>
-
-
-                        <td
-                            class="${percentageClass}">
-
-                            ${percentage}%
-
-                        </td>
-
-                    </tr>
-
-                `;
-
-            }
-        ).join("");
+        }).join("");
 }
 
 
@@ -1025,63 +895,47 @@ function exportCSV() {
     let csv =
         "Date,Period,Roll Number,Student Name,Status\n";
 
-
     Object.keys(
         attendance
-    ).forEach(
-        key => {
+    ).forEach(key => {
 
-            const parts =
-                key.split(
-                    "_period_"
+        const parts =
+            key.split("_period_");
+
+        const date =
+            parts[0];
+
+        const period =
+            parts[1];
+
+        const records =
+            attendance[key];
+
+        Object.keys(
+            records
+        ).forEach(roll => {
+
+            const student =
+                students.find(
+                    item =>
+                        item.roll === roll
                 );
 
+            const name =
+                student?.name || "";
 
-            const date =
-                parts[0];
-
-
-            const period =
-                parts[1];
-
-
-            const records =
-                attendance[key];
-
-
-            Object.keys(
-                records
-            ).forEach(
-                roll => {
-
-                    const student =
-                        students.find(
-                            item =>
-                                item.roll ===
-                                roll
-                        );
-
-
-                    const name =
-                        student?.name || "";
-
-
-                    csv +=
-                        `"${date}",` +
-                        `"Period ${period}",` +
-                        `"${roll}",` +
-                        `"${name}",` +
-                        `"${records[roll]}"\n`;
-
-                }
-            );
-
-        }
-    );
-
+            csv +=
+                `"${date}",` +
+                `"Period ${period}",` +
+                `"${roll}",` +
+                `"${name}",` +
+                `"${records[roll]}"\n`;
+        });
+    });
 
     if (
-        csv.split("\n").length <= 1
+        csv.trim() ===
+        "Date,Period,Roll Number,Student Name,Status"
     ) {
 
         alert(
@@ -1090,7 +944,6 @@ function exportCSV() {
 
         return;
     }
-
 
     const blob =
         new Blob(
@@ -1101,37 +954,22 @@ function exportCSV() {
             }
         );
 
-
     const url =
-        URL.createObjectURL(
-            blob
-        );
-
+        URL.createObjectURL(blob);
 
     const link =
-        document.createElement(
-            "a"
-        );
-
+        document.createElement("a");
 
     link.href = url;
 
     link.download =
         "student-attendance.csv";
 
-
-    document.body.appendChild(
-        link
-    );
-
+    document.body.appendChild(link);
 
     link.click();
 
-
-    document.body.removeChild(
-        link
-    );
-
+    document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
 }
@@ -1151,16 +989,13 @@ function deleteAllAttendance() {
         return;
     }
 
-
     attendance = {};
-
 
     saveAttendanceData();
 
     loadAttendance();
 
     displayStudentSummary();
-
 
     alert(
         "All attendance records deleted."
@@ -1177,14 +1012,11 @@ function formatDate(date) {
     const parts =
         date.split("-");
 
-
     if (
         parts.length !== 3
     ) {
-
         return date;
     }
-
 
     return (
         parts[2] +
@@ -1230,5 +1062,6 @@ function escapeHTML(value) {
         );
 }
 ```
+
 
 
