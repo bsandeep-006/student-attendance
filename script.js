@@ -1,22 +1,23 @@
 ```javascript
-// ============================================
-// STUDENT ATTENDANCE SYSTEM
-// ============================================
+// ======================================
+// LOAD SAVED DATA
+// ======================================
 
-
-// Get saved data
-
-let attendanceData =
+let students =
     JSON.parse(
-        localStorage.getItem(
-            "attendanceData"
-        )
+        localStorage.getItem("students")
     ) || [];
 
 
-// ============================================
-// SET TODAY'S DATE
-// ============================================
+let attendance =
+    JSON.parse(
+        localStorage.getItem("attendance")
+    ) || [];
+
+
+// ======================================
+// TODAY DATE
+// ======================================
 
 function getToday() {
 
@@ -44,102 +45,273 @@ document.getElementById(
 ).value = getToday();
 
 
-// ============================================
-// ADD ATTENDANCE
-// ============================================
+// ======================================
+// SAVE STUDENTS
+// ======================================
 
-function addAttendance() {
+function saveStudents() {
 
-    const name =
-        document
-            .getElementById(
-                "studentName"
-            )
-            .value
-            .trim();
+    localStorage.setItem(
+        "students",
+        JSON.stringify(students)
+    );
+}
 
+
+// ======================================
+// SAVE ATTENDANCE
+// ======================================
+
+function saveAttendance() {
+
+    localStorage.setItem(
+        "attendance",
+        JSON.stringify(attendance)
+    );
+}
+
+
+// ======================================
+// ADD STUDENT
+// ======================================
+
+function addStudent() {
 
     const roll =
         document
-            .getElementById(
-                "rollNumber"
-            )
+            .getElementById("rollNumber")
             .value
             .trim();
 
 
-    const date =
+    const name =
         document
-            .getElementById(
-                "attendanceDate"
-            )
-            .value;
+            .getElementById("studentName")
+            .value
+            .trim();
+
+
+    if (!roll || !name) {
+
+        alert(
+            "Please enter Roll Number and Student Name."
+        );
+
+        return;
+    }
+
+
+    // Check duplicate roll number
+
+    const exists =
+        students.some(
+            student =>
+                student.roll.toLowerCase() ===
+                roll.toLowerCase()
+        );
+
+
+    if (exists) {
+
+        alert(
+            "This roll number already exists."
+        );
+
+        return;
+    }
+
+
+    // Add student
+
+    students.push({
+
+        id: Date.now(),
+
+        roll: roll,
+
+        name: name
+
+    });
+
+
+    saveStudents();
+
+
+    // Clear inputs
+
+    document.getElementById(
+        "rollNumber"
+    ).value = "";
+
+
+    document.getElementById(
+        "studentName"
+    ).value = "";
+
+
+    updateStudentDropdown();
+
+    displayStudents();
+
+    updateSummary();
+
+
+    alert(
+        "Student added successfully!"
+    );
+}
+
+
+// ======================================
+// STUDENT DROPDOWN
+// ======================================
+
+function updateStudentDropdown() {
+
+    const select =
+        document.getElementById(
+            "studentSelect"
+        );
+
+
+    select.innerHTML = `
+
+        <option value="">
+            Select Student
+        </option>
+
+    `;
+
+
+    students.forEach(
+        student => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                student.id;
+
+
+            option.textContent =
+                `${student.roll} - ${student.name}`;
+
+
+            select.appendChild(
+                option
+            );
+        }
+    );
+}
+
+
+// ======================================
+// ADD ATTENDANCE
+// ======================================
+
+function addAttendance() {
+
+    const studentId =
+        Number(
+            document.getElementById(
+                "studentSelect"
+            ).value
+        );
+
+
+    const date =
+        document.getElementById(
+            "attendanceDate"
+        ).value;
 
 
     const period =
-        document
-            .getElementById(
-                "period"
-            )
-            .value;
+        document.getElementById(
+            "period"
+        ).value;
 
 
     const status =
-        document
-            .getElementById(
-                "status"
-            )
-            .value;
+        document.getElementById(
+            "status"
+        ).value;
 
-
-    // Validate
 
     if (
-        !name ||
-        !roll ||
+        !studentId ||
         !date ||
         !period ||
         !status
     ) {
 
         alert(
-            "Please fill all fields."
+            "Please select Student, Date, Period and Attendance."
         );
 
         return;
     }
 
 
-    // Check duplicate attendance
+    // Find student
+
+    const student =
+        students.find(
+            item =>
+                item.id === studentId
+        );
+
+
+    if (!student) {
+
+        alert(
+            "Student not found."
+        );
+
+        return;
+    }
+
+
+    // Check duplicate
 
     const duplicate =
-        attendanceData.some(
+        attendance.some(
             record =>
-                record.date === date &&
-                record.roll === roll &&
-                record.period === period
+
+                record.studentId ===
+                studentId &&
+
+                record.date ===
+                date &&
+
+                record.period ===
+                period
         );
 
 
     if (duplicate) {
 
         alert(
-            "Attendance for this student, date and period already exists."
+            "Attendance already exists for this student, date and period."
         );
 
         return;
     }
 
 
-    // Create record
+    // Create attendance
 
-    const record = {
+    attendance.push({
 
         id: Date.now(),
 
-        name: name,
+        studentId: studentId,
 
-        roll: roll,
+        roll: student.roll,
+
+        name: student.name,
 
         date: date,
 
@@ -147,41 +319,27 @@ function addAttendance() {
 
         status: status
 
-    };
+    });
 
 
-    // Add record
-
-    attendanceData.push(record);
+    saveAttendance();
 
 
-    // Save data
-
-    saveData();
-
-
-    // Clear fields except date
-
-    document.getElementById(
-        "studentName"
-    ).value = "";
-
-    document.getElementById(
-        "rollNumber"
-    ).value = "";
+    // Reset attendance fields
 
     document.getElementById(
         "period"
     ).value = "";
+
 
     document.getElementById(
         "status"
     ).value = "";
 
 
-    // Display
-
     displayAttendance();
+
+    updateSummary();
 
 
     alert(
@@ -190,24 +348,90 @@ function addAttendance() {
 }
 
 
-// ============================================
-// SAVE DATA
-// ============================================
+// ======================================
+// DISPLAY STUDENTS
+// ======================================
 
-function saveData() {
+function displayStudents() {
 
-    localStorage.setItem(
-        "attendanceData",
-        JSON.stringify(
-            attendanceData
-        )
-    );
+    const table =
+        document.getElementById(
+            "studentTable"
+        );
+
+
+    if (students.length === 0) {
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    class="empty">
+
+                    No students added yet.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+    }
+
+
+    table.innerHTML =
+        students.map(
+            (student, index) => `
+
+                <tr>
+
+                    <td>
+                        ${index + 1}
+                    </td>
+
+                    <td>
+                        <strong>
+                            ${escapeHTML(
+                                student.roll
+                            )}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            student.name
+                        )}
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="delete-button"
+                            onclick="
+                                deleteStudent(
+                                    ${student.id}
+                                )
+                            ">
+
+                            Delete
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `
+        ).join("");
 }
 
 
-// ============================================
+// ======================================
 // DISPLAY ATTENDANCE
-// ============================================
+// ======================================
 
 function displayAttendance() {
 
@@ -217,69 +441,7 @@ function displayAttendance() {
         );
 
 
-    const search =
-        document
-            .getElementById(
-                "search"
-            )
-            .value
-            .toLowerCase()
-            .trim();
-
-
-    const filterDate =
-        document.getElementById(
-            "filterDate"
-        ).value;
-
-
-    const filterPeriod =
-        document.getElementById(
-            "filterPeriod"
-        ).value;
-
-
-    // Filter records
-
-    const filtered =
-        attendanceData.filter(
-            record => {
-
-                const matchesSearch =
-                    !search ||
-                    record.name
-                        .toLowerCase()
-                        .includes(search) ||
-                    record.roll
-                        .toLowerCase()
-                        .includes(search);
-
-
-                const matchesDate =
-                    !filterDate ||
-                    record.date ===
-                    filterDate;
-
-
-                const matchesPeriod =
-                    !filterPeriod ||
-                    record.period ===
-                    filterPeriod;
-
-
-                return (
-                    matchesSearch &&
-                    matchesDate &&
-                    matchesPeriod
-                );
-
-            }
-        );
-
-
-    // Empty
-
-    if (filtered.length === 0) {
+    if (attendance.length === 0) {
 
         table.innerHTML = `
 
@@ -289,7 +451,7 @@ function displayAttendance() {
                     colspan="7"
                     class="empty">
 
-                    No attendance records found.
+                    No attendance records yet.
 
                 </td>
 
@@ -297,114 +459,202 @@ function displayAttendance() {
 
         `;
 
-        updateSummary();
-
         return;
     }
 
 
-    // Display records
+    // Newest first
+
+    const records =
+        [...attendance].reverse();
+
 
     table.innerHTML =
-        filtered
-            .map(
-                (record, index) => {
+        records.map(
+            (record, index) => {
 
-                    const statusClass =
-                        record.status ===
-                        "Present"
-                            ? "status-present"
-                            : "status-absent";
+                const statusClass =
+                    record.status ===
+                    "Present"
+                        ? "present"
+                        : "absent";
 
 
-                    return `
+                return `
 
-                        <tr>
+                    <tr>
 
-                            <td>
-                                ${index + 1}
-                            </td>
+                        <td>
+                            ${index + 1}
+                        </td>
 
-                            <td>
-                                ${formatDate(
-                                    record.date
-                                )}
-                            </td>
+                        <td>
+                            ${formatDate(
+                                record.date
+                            )}
+                        </td>
 
-                            <td>
-                                <strong>
-                                    ${escapeHTML(
-                                        record.roll
-                                    )}
-                                </strong>
-                            </td>
+                        <td>
+                            ${escapeHTML(
+                                record.roll
+                            )}
+                        </td>
 
-                            <td>
-                                ${escapeHTML(
-                                    record.name
-                                )}
-                            </td>
+                        <td>
+                            ${escapeHTML(
+                                record.name
+                            )}
+                        </td>
 
-                            <td>
-                                Period
-                                ${record.period}
-                            </td>
+                        <td>
+                            Period
+                            ${record.period}
+                        </td>
 
-                            <td>
+                        <td>
 
-                                <span
-                                    class="status
-                                    ${statusClass}">
+                            <span
+                                class="${statusClass}">
 
-                                    ${record.status === "Present"
-                                        ? "✓ Present"
-                                        : "✕ Absent"}
+                                ${
+                                    record.status ===
+                                    "Present"
+                                    ? "✓ Present"
+                                    : "✕ Absent"
+                                }
 
-                                </span>
+                            </span>
 
-                            </td>
+                        </td>
 
-                            <td>
+                        <td>
 
-                                <button
-                                    class="delete-button"
-                                    onclick="
-                                        deleteAttendance(
-                                            ${record.id}
-                                        )
-                                    ">
+                            <button
+                                class="delete-button"
+                                onclick="
+                                    deleteAttendance(
+                                        ${record.id}
+                                    )
+                                ">
 
-                                    Delete
+                                Delete
 
-                                </button>
+                            </button>
 
-                            </td>
+                        </td>
 
-                        </tr>
+                    </tr>
 
-                    `;
+                `;
+            }
+        ).join("");
+}
 
-                }
-            )
-            .join("");
 
+// ======================================
+// DELETE STUDENT
+// ======================================
+
+function deleteStudent(id) {
+
+    const student =
+        students.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!student) {
+        return;
+    }
+
+
+    const confirmDelete =
+        confirm(
+            `Delete ${student.name} and all attendance records?`
+        );
+
+
+    if (!confirmDelete) {
+        return;
+    }
+
+
+    // Delete student
+
+    students =
+        students.filter(
+            item =>
+                item.id !== id
+        );
+
+
+    // Delete student's attendance
+
+    attendance =
+        attendance.filter(
+            record =>
+                record.studentId !== id
+        );
+
+
+    saveStudents();
+
+    saveAttendance();
+
+
+    updateStudentDropdown();
+
+    displayStudents();
+
+    displayAttendance();
 
     updateSummary();
 }
 
 
-// ============================================
-// UPDATE SUMMARY
-// ============================================
+// ======================================
+// DELETE ATTENDANCE
+// ======================================
+
+function deleteAttendance(id) {
+
+    if (
+        !confirm(
+            "Delete this attendance record?"
+        )
+    ) {
+        return;
+    }
+
+
+    attendance =
+        attendance.filter(
+            record =>
+                record.id !== id
+        );
+
+
+    saveAttendance();
+
+    displayAttendance();
+
+    updateSummary();
+}
+
+
+// ======================================
+// SUMMARY
+// ======================================
 
 function updateSummary() {
 
-    const total =
-        attendanceData.length;
+    const totalStudents =
+        students.length;
 
 
     const present =
-        attendanceData.filter(
+        attendance.filter(
             record =>
                 record.status ===
                 "Present"
@@ -412,11 +662,15 @@ function updateSummary() {
 
 
     const absent =
-        attendanceData.filter(
+        attendance.filter(
             record =>
                 record.status ===
                 "Absent"
         ).length;
+
+
+    const total =
+        present + absent;
 
 
     const percentage =
@@ -430,18 +684,21 @@ function updateSummary() {
 
 
     document.getElementById(
-        "totalRecords"
-    ).textContent = total;
+        "totalStudents"
+    ).textContent =
+        totalStudents;
 
 
     document.getElementById(
         "totalPresent"
-    ).textContent = present;
+    ).textContent =
+        present;
 
 
     document.getElementById(
         "totalAbsent"
-    ).textContent = absent;
+    ).textContent =
+        absent;
 
 
     document.getElementById(
@@ -451,114 +708,51 @@ function updateSummary() {
 }
 
 
-// ============================================
-// DELETE ONE RECORD
-// ============================================
-
-function deleteAttendance(id) {
-
-    const confirmDelete =
-        confirm(
-            "Delete this attendance record?"
-        );
-
-
-    if (!confirmDelete) {
-        return;
-    }
-
-
-    attendanceData =
-        attendanceData.filter(
-            record =>
-                record.id !== id
-        );
-
-
-    saveData();
-
-    displayAttendance();
-}
-
-
-// ============================================
+// ======================================
 // DELETE ALL DATA
-// ============================================
+// ======================================
 
-function deleteAllAttendance() {
+function deleteAllData() {
 
     if (
-        attendanceData.length === 0
+        !confirm(
+            "Delete ALL students and attendance data?"
+        )
     ) {
-
-        alert(
-            "There is no data to delete."
-        );
-
         return;
     }
 
 
-    const confirmDelete =
-        confirm(
-            "Are you sure you want to delete ALL attendance data?"
-        );
+    students = [];
+
+    attendance = [];
 
 
-    if (!confirmDelete) {
-        return;
-    }
+    saveStudents();
+
+    saveAttendance();
 
 
-    attendanceData = [];
+    updateStudentDropdown();
 
-
-    saveData();
+    displayStudents();
 
     displayAttendance();
+
+    updateSummary();
 
 
     alert(
-        "All attendance data deleted."
+        "All data deleted."
     );
 }
 
 
-// ============================================
-// CLEAR FILTERS
-// ============================================
-
-function clearFilters() {
-
-    document.getElementById(
-        "search"
-    ).value = "";
-
-
-    document.getElementById(
-        "filterDate"
-    ).value = "";
-
-
-    document.getElementById(
-        "filterPeriod"
-    ).value = "";
-
-
-    displayAttendance();
-}
-
-
-// ============================================
+// ======================================
 // FORMAT DATE
-// ============================================
+// ======================================
 
 function formatDate(date) {
-
-    if (!date) {
-        return "";
-    }
-
 
     const parts =
         date.split("-");
@@ -574,9 +768,9 @@ function formatDate(date) {
 }
 
 
-// ============================================
+// ======================================
 // ESCAPE HTML
-// ============================================
+// ======================================
 
 function escapeHTML(value) {
 
@@ -609,82 +803,17 @@ function escapeHTML(value) {
 }
 
 
-// ============================================
-// EXPORT DATA
-// ============================================
+// ======================================
+// INITIAL LOAD
+// ======================================
 
-function exportData() {
+updateStudentDropdown();
 
-    if (
-        attendanceData.length === 0
-    ) {
-
-        alert(
-            "No attendance data to export."
-        );
-
-        return;
-    }
-
-
-    let csv =
-        "Date,Roll Number,Student Name,Period,Status\n";
-
-
-    attendanceData.forEach(
-        record => {
-
-            csv +=
-                `"${record.date}",` +
-                `"${record.roll}",` +
-                `"${record.name}",` +
-                `"Period ${record.period}",` +
-                `"${record.status}"\n`;
-
-        }
-    );
-
-
-    const blob =
-        new Blob(
-            [csv],
-            {
-                type:
-                    "text/csv"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    link.href = url;
-
-    link.download =
-        "attendance.csv";
-
-
-    link.click();
-
-
-    URL.revokeObjectURL(url);
-}
-
-
-// ============================================
-// INITIAL DISPLAY
-// ============================================
+displayStudents();
 
 displayAttendance();
+
+updateSummary();
 ```
 
 
