@@ -33,12 +33,13 @@ header {
 
     padding: 30px;
 
-    border-radius: 16px;
+    border-radius: 15px;
 
     text-align: center;
 
     margin-bottom: 20px;
 }
+
 
 header h1 {
     margin-bottom: 8px;
@@ -61,6 +62,7 @@ header h1 {
         rgba(0,0,0,0.08);
 }
 
+
 .card h2 {
     margin-bottom: 20px;
 }
@@ -74,8 +76,8 @@ header h1 {
 
     grid-template-columns:
         repeat(
-            5,
-            1fr
+            auto-fit,
+            minmax(220px, 1fr)
         );
 
     gap: 15px;
@@ -83,6 +85,7 @@ header h1 {
 
 
 .form-group {
+
     display: flex;
 
     flex-direction: column;
@@ -92,6 +95,7 @@ header h1 {
 
 
 .form-group label {
+
     font-weight: bold;
 
     font-size: 14px;
@@ -109,40 +113,35 @@ select {
 
     border-radius: 8px;
 
-    background: white;
-
     font-size: 15px;
 
-    outline: none;
+    background: white;
 }
 
 
 input:focus,
 select:focus {
 
-    border-color: #2563eb;
+    outline: none;
 
-    box-shadow:
-        0 0 0 2px
-        rgba(37,99,235,0.1);
+    border-color: #2563eb;
 }
 
 
-/* ADD BUTTON */
+/* BUTTONS */
 
-.add-button {
+.add-button,
+.attendance-button {
 
     margin-top: 20px;
 
-    background: #2563eb;
-
-    color: white;
+    padding: 13px 25px;
 
     border: none;
 
-    padding: 13px 25px;
-
     border-radius: 8px;
+
+    color: white;
 
     font-size: 16px;
 
@@ -152,8 +151,45 @@ select:focus {
 }
 
 
+.add-button {
+
+    background: #2563eb;
+}
+
+
 .add-button:hover {
+
     background: #1d4ed8;
+}
+
+
+.attendance-button {
+
+    background: #16a34a;
+}
+
+
+.attendance-button:hover {
+
+    background: #15803d;
+}
+
+
+.danger-button {
+
+    background: #dc2626;
+
+    color: white;
+
+    border: none;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: bold;
 }
 
 
@@ -177,28 +213,26 @@ select:focus {
 
 .summary-box {
 
+    color: white;
+
     padding: 22px;
 
     border-radius: 14px;
-
-    color: white;
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 8px;
 
     text-align: center;
 }
 
 
 .summary-box span {
-    font-size: 15px;
+
+    display: block;
+
+    margin-bottom: 8px;
 }
 
 
 .summary-box strong {
+
     font-size: 30px;
 }
 
@@ -223,40 +257,6 @@ select:focus {
 }
 
 
-/* FILTER */
-
-.filter-row {
-
-    display: grid;
-
-    grid-template-columns:
-        2fr
-        1fr
-        1fr
-        auto;
-
-    gap: 10px;
-}
-
-
-.clear-filter {
-
-    background: #64748b;
-
-    color: white;
-
-    border: none;
-
-    padding: 10px 18px;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    font-weight: bold;
-}
-
-
 /* TABLE */
 
 .table-container {
@@ -271,7 +271,7 @@ table {
 
     border-collapse: collapse;
 
-    min-width: 800px;
+    min-width: 700px;
 }
 
 
@@ -302,31 +302,31 @@ tr:nth-child(even) {
 
 /* STATUS */
 
-.status {
+.present {
+
+    background: #dcfce7;
+
+    color: #15803d;
 
     padding: 6px 12px;
 
     border-radius: 20px;
 
-    font-size: 13px;
-
     font-weight: bold;
 }
 
 
-.status-present {
-
-    background: #dcfce7;
-
-    color: #15803d;
-}
-
-
-.status-absent {
+.absent {
 
     background: #fee2e2;
 
     color: #b91c1c;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    font-weight: bold;
 }
 
 
@@ -348,65 +348,13 @@ tr:nth-child(even) {
 }
 
 
-.delete-button:hover {
-
-    background: #b91c1c;
-}
-
-
-/* DATA BUTTONS */
-
-.data-buttons {
-
-    display: flex;
-
-    gap: 10px;
-}
-
-
-.danger-button {
-
-    background: #dc2626;
-
-    color: white;
-
-    border: none;
-
-    padding: 12px 18px;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    font-weight: bold;
-}
-
-
-.export-button {
-
-    background: #16a34a;
-
-    color: white;
-
-    border: none;
-
-    padding: 12px 18px;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    font-weight: bold;
-}
-
-
 /* EMPTY */
 
 .empty {
 
-    padding: 30px;
-
     text-align: center;
+
+    padding: 25px;
 
     color: #64748b;
 }
@@ -414,31 +362,7 @@ tr:nth-child(even) {
 
 /* MOBILE */
 
-@media (max-width: 900px) {
-
-    .form-grid {
-
-        grid-template-columns:
-            repeat(2, 1fr);
-    }
-
-
-    .summary {
-
-        grid-template-columns:
-            repeat(2, 1fr);
-    }
-
-
-    .filter-row {
-
-        grid-template-columns:
-            1fr 1fr;
-    }
-}
-
-
-@media (max-width: 600px) {
+@media (max-width: 700px) {
 
     body {
         padding: 10px;
@@ -450,33 +374,20 @@ tr:nth-child(even) {
     }
 
 
-    .form-grid {
+    .summary {
 
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            repeat(2, 1fr);
     }
+}
 
+
+@media (max-width: 450px) {
 
     .summary {
 
         grid-template-columns: 1fr;
     }
-
-
-    .filter-row {
-
-        grid-template-columns: 1fr;
-    }
-
-
-    .data-buttons {
-
-        flex-direction: column;
-    }
-
-
-    .data-buttons button {
-
-        width: 100%;
-    }
 }
 ```
+
