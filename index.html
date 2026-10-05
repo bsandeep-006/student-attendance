@@ -7,6 +7,7 @@
 
     <title>Student Attendance Register</title>
 
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -14,51 +15,15 @@
 
 <div class="container">
 
+    <!-- HEADER -->
     <header>
         <h1>📚 Student Attendance Register</h1>
-        <p>Student Data & 7 Period Attendance</p>
+        <p>7 Period Attendance Management System</p>
     </header>
 
 
-    <!-- DATE / CLASS -->
-
-    <section class="controls">
-
-        <div>
-            <label>Date</label>
-            <input type="date" id="date">
-        </div>
-
-        <div>
-            <label>Class</label>
-            <input
-                type="text"
-                id="className"
-                placeholder="Example: CSE 1"
-            >
-        </div>
-
-        <div>
-            <label>Search Student</label>
-            <input
-                type="text"
-                id="search"
-                placeholder="Search name or roll number"
-            >
-        </div>
-
-        <button
-            class="export-btn"
-            onclick="exportCSV()">
-            📥 Export CSV
-        </button>
-
-    </section>
-
-
     <!-- ADD STUDENT -->
-
-    <section class="student-form">
+    <section class="card">
 
         <h2>➕ Add Student</h2>
 
@@ -66,21 +31,13 @@
 
             <input
                 type="text"
-                id="roll"
-                placeholder="Roll Number"
-            >
+                id="rollNumber"
+                placeholder="Roll Number">
 
             <input
                 type="text"
                 id="studentName"
-                placeholder="Student Name"
-            >
-
-            <input
-                type="text"
-                id="studentClass"
-                placeholder="Class"
-            >
+                placeholder="Student Name">
 
             <button
                 class="add-btn"
@@ -93,74 +50,79 @@
     </section>
 
 
-    <!-- STUDENT DATA MANAGEMENT -->
+    <!-- DATE AND CONTROLS -->
+    <section class="card">
 
-    <section class="data-section">
+        <div class="date-box">
 
-        <h2>💾 Student Data</h2>
-
-        <div class="data-buttons">
-
-            <button
-                class="save-btn"
-                onclick="downloadStudentData()">
-                💾 Save Student Data
-            </button>
-
-            <label class="restore-btn">
-
-                📂 Restore Student Data
-
-                <input
-                    type="file"
-                    id="restoreFile"
-                    accept=".json"
-                    onchange="restoreStudentData(event)"
-                >
-
+            <label for="attendanceDate">
+                📅 Select Date:
             </label>
 
-        </div>
+            <input
+                type="date"
+                id="attendanceDate"
+                onchange="renderAttendance()">
 
-        <p class="save-info">
-            Student information is automatically saved in your browser.
-        </p>
+            <button
+                class="success"
+                onclick="markAllPresent()">
+                ✓ All Present
+            </button>
 
-    </section>
+            <button
+                class="danger"
+                onclick="markAllAbsent()">
+                ✕ All Absent
+            </button>
 
+            <button
+                class="info"
+                onclick="clearToday()">
+                Clear Attendance
+            </button>
 
-    <!-- STATISTICS -->
-
-    <section class="stats">
-
-        <div class="stat blue">
-            <h3>Total Students</h3>
-            <p id="studentCount">0</p>
-        </div>
-
-        <div class="stat green">
-            <h3>Present</h3>
-            <p id="presentCount">0</p>
-        </div>
-
-        <div class="stat red">
-            <h3>Absent</h3>
-            <p id="absentCount">0</p>
-        </div>
-
-        <div class="stat purple">
-            <h3>Attendance</h3>
-            <p id="percentage">0%</p>
         </div>
 
     </section>
 
 
-    <!-- ATTENDANCE -->
+    <!-- SUMMARY -->
+    <section class="card">
 
-    <section class="attendance">
+        <h2>📊 Today's Summary</h2>
 
-        <h2>📋 Attendance Register</h2>
+        <div class="summary-grid">
+
+            <div class="summary-box blue">
+                <p>Total Students</p>
+                <h2 id="totalStudents">0</h2>
+            </div>
+
+            <div class="summary-box green">
+                <p>Present</p>
+                <h2 id="totalPresent">0</h2>
+            </div>
+
+            <div class="summary-box red">
+                <p>Absent</p>
+                <h2 id="totalAbsent">0</h2>
+            </div>
+
+            <div class="summary-box purple">
+                <p>Attendance %</p>
+                <h2 id="attendancePercentage">0%</h2>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ATTENDANCE TABLE -->
+    <section class="card">
+
+        <h2>📝 Attendance Register</h2>
 
         <div class="table-container">
 
@@ -169,61 +131,45 @@
                 <thead>
 
                     <tr>
-
-                        <th>Roll</th>
-
+                        <th>Roll No.</th>
                         <th>Student Name</th>
-
-                        <th>Class</th>
-
-                        <th>P1</th>
-
-                        <th>P2</th>
-
-                        <th>P3</th>
-
-                        <th>P4</th>
-
-                        <th>P5</th>
-
-                        <th>P6</th>
-
-                        <th>P7</th>
-
-                        <th>Actions</th>
-
+                        <th>Period 1</th>
+                        <th>Period 2</th>
+                        <th>Period 3</th>
+                        <th>Period 4</th>
+                        <th>Period 5</th>
+                        <th>Period 6</th>
+                        <th>Period 7</th>
                     </tr>
 
                 </thead>
 
-                <tbody id="tableBody"></tbody>
+                <tbody id="attendanceTable">
+                </tbody>
 
             </table>
-
-        </div>
-
-        <div class="legend">
-
-            <span class="present-text">
-                🟢 P = Present
-            </span>
-
-            <span class="absent-text">
-                🔴 A = Absent
-            </span>
 
         </div>
 
     </section>
 
 
-    <footer>
-        Student Attendance Register © 2026
-    </footer>
+    <!-- STUDENT LIST -->
+    <section class="card">
+
+        <h2>👨‍🎓 Students</h2>
+
+        <div
+            id="studentList"
+            class="student-list">
+        </div>
+
+    </section>
 
 </div>
 
 
+<!-- JAVASCRIPT -->
 <script src="script.js"></script>
 
 </body>
