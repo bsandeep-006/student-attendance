@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Student Attendance Register</title>
-
+    <title>Daily Student Attendance</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -14,298 +12,110 @@
 
 <div class="container">
 
-    <!-- HEADER -->
-    <header>
-        <h1>📚 Student Attendance Register</h1>
-        <p>Daily Attendance - 7 Periods</p>
-    </header>
+    <h1>📚 Student Attendance Register</h1>
 
+    <!-- DATE & PERIOD -->
+    <div class="controls">
 
-    <!-- STUDENT MANAGEMENT -->
-    <section class="card">
-
-        <div class="section-title">
-            <div>
-                <h2>👨‍🎓 Student Data</h2>
-                <p>Add or update student names.</p>
-            </div>
-
-            <button
-                class="secondary-btn"
-                onclick="resetStudentNames()">
-                Reset Names
-            </button>
+        <div>
+            <label>📅 Date</label>
+            <input type="date" id="date">
         </div>
 
+        <div>
+            <label>📚 Period</label>
 
-        <div class="student-form">
-
-            <select id="studentEditSelect">
-                <option value="">Select Roll Number</option>
+            <select id="period">
+                <option value="1">Period 1</option>
+                <option value="2">Period 2</option>
+                <option value="3">Period 3</option>
+                <option value="4">Period 4</option>
+                <option value="5">Period 5</option>
+                <option value="6">Period 6</option>
+                <option value="7">Period 7</option>
             </select>
-
-
-            <input
-                type="text"
-                id="editStudentName"
-                placeholder="Enter student name">
-
-
-            <button
-                class="primary-btn"
-                onclick="saveStudentName()">
-
-                ➕ Add / Save Student
-
-            </button>
-
         </div>
 
-    </section>
+    </div>
 
 
-    <!-- ATTENDANCE CONTROL -->
-    <section class="card">
+    <!-- QUICK BUTTONS -->
+    <div class="quick-buttons">
 
-        <h2>📝 Daily Attendance</h2>
+        <button class="all-present" onclick="markAll('Present')">
+            🟢 Mark All Present
+        </button>
 
-        <div class="controls">
+        <button class="all-absent" onclick="markAll('Absent')">
+            🔴 Mark All Absent
+        </button>
 
-            <div class="control">
-
-                <label>📅 Date</label>
-
-                <input
-                    type="date"
-                    id="attendanceDate"
-                    onchange="loadAttendance()">
-
-            </div>
-
-
-            <div class="control">
-
-                <label>📚 Period</label>
-
-                <select
-                    id="period"
-                    onchange="loadAttendance()">
-
-                    <option value="1">Period 1</option>
-                    <option value="2">Period 2</option>
-                    <option value="3">Period 3</option>
-                    <option value="4">Period 4</option>
-                    <option value="5">Period 5</option>
-                    <option value="6">Period 6</option>
-                    <option value="7">Period 7</option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-
-        <div class="quick-buttons">
-
-            <button
-                class="present-all"
-                onclick="markAll('Present')">
-
-                ✓ Mark All Present
-
-            </button>
-
-
-            <button
-                class="absent-all"
-                onclick="markAll('Absent')">
-
-                ✕ Mark All Absent
-
-            </button>
-
-
-            <button
-                class="clear-all"
-                onclick="clearCurrentPeriod()">
-
-                Clear Period
-
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- SUMMARY -->
-    <section class="summary">
-
-        <div class="summary-box blue">
-
-            <span>Total Students</span>
-
-            <strong id="totalStudents">0</strong>
-
-        </div>
-
-
-        <div class="summary-box green">
-
-            <span>Present</span>
-
-            <strong id="presentCount">0</strong>
-
-        </div>
-
-
-        <div class="summary-box red">
-
-            <span>Absent</span>
-
-            <strong id="absentCount">0</strong>
-
-        </div>
-
-
-        <div class="summary-box purple">
-
-            <span>Not Marked</span>
-
-            <strong id="notMarkedCount">0</strong>
-
-        </div>
-
-    </section>
+    </div>
 
 
     <!-- ATTENDANCE TABLE -->
-    <section class="card">
+    <div class="table-box">
 
-        <div class="table-header">
+        <table>
 
-            <div>
-                <h2>📋 Attendance</h2>
+            <thead>
 
-                <p id="currentInfo">
-                    Date / Period
-                </p>
-            </div>
+                <tr>
+                    <th>S.No</th>
+                    <th>Roll Number</th>
+                    <th>Student Name</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                </tr>
 
+            </thead>
+
+            <tbody id="studentTable"></tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- SAVE -->
+    <button class="save-button" onclick="saveAttendance()">
+        💾 SAVE ATTENDANCE
+    </button>
+
+
+    <!-- SUMMARY -->
+    <div class="summary">
+
+        <div class="box total">
+            <span>Total</span>
+            <b id="total">0</b>
         </div>
 
-
-        <div class="table-container">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>S.No</th>
-                        <th>Roll Number</th>
-                        <th>Student Name</th>
-                        <th>Present</th>
-                        <th>Absent</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="attendanceTable">
-                </tbody>
-
-            </table>
-
+        <div class="box present">
+            <span>Present</span>
+            <b id="present">0</b>
         </div>
 
-
-        <div class="save-area">
-
-            <button
-                class="save-btn"
-                onclick="saveAttendance()">
-
-                💾 SAVE ATTENDANCE
-
-            </button>
-
+        <div class="box absent">
+            <span>Absent</span>
+            <b id="absent">0</b>
         </div>
 
-    </section>
-
-
-    <!-- STUDENT ATTENDANCE SUMMARY -->
-    <section class="card">
-
-        <h2>📊 Student Attendance Summary</h2>
-
-        <div class="table-container">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>Roll Number</th>
-                        <th>Student Name</th>
-                        <th>Present</th>
-                        <th>Absent</th>
-                        <th>Total</th>
-                        <th>Percentage</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="summaryTable">
-                </tbody>
-
-            </table>
-
+        <div class="box notmarked">
+            <span>Not Marked</span>
+            <b id="notMarked">0</b>
         </div>
 
-    </section>
+    </div>
 
 
-    <!-- DATA MANAGEMENT -->
-    <section class="card">
-
-        <h2>💾 Data Management</h2>
-
-        <div class="data-buttons">
-
-            <button
-                class="export-btn"
-                onclick="exportCSV()">
-
-                📥 Export CSV
-
-            </button>
-
-
-            <button
-                class="danger-btn"
-                onclick="deleteAllAttendance()">
-
-                🗑 Delete Attendance
-
-            </button>
-
-        </div>
-
-    </section>
+    <div id="message"></div>
 
 </div>
-
 
 <script src="script.js"></script>
 
 </body>
 </html>
 ```
+
